@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FNL | Financial Network Latino</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #00d4ff;
+            --primary-dark: #00a8cc;
+            --secondary: #ff6b6b;
+            --accent: #00ff88;
+            --bg-dark: #050508;
+            --bg-panel: #0a0a12;
+            --bg-card: #101018;
+            --text: #ffffff;
+            --text-muted: #6b6b7a;
+            --success: #00ff88;
+            --danger: #ff4757;
+            --warning: #ffd43b;
+            --border: rgba(255,255,255,0.06);
+            --gradient: linear-gradient(135deg, var(--primary), #00ff88);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; user-select: none; }
+        body { background: var(--bg-dark); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+
+        .loader-screen { position: fixed; inset: 0; background: var(--bg-dark); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s; }
+        .loader-screen.hidden { opacity: 0; pointer-events: none; }
+        .spinner { width: 60px; height: 60px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loader-text { margin-top: 15px; color: var(--primary); font-family: 'Space Mono'; letter-spacing: 2px; font-size: 0.8rem; }
+
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--primary); padding: 14px 18px; border-radius: 10px; min-width: 300px; display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s ease forwards; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.info { border-left-color: var(--primary); }
+        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        .auth-view { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at top, rgba(0,212,255,0.15), transparent 60%), var(--bg-dark); padding: 20px; }
+        .auth-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 24px; padding: 40px; width: 100%; max-width: 400px; backdrop-filter: blur(20px); box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+        .brand { text-align: center; margin-bottom: 30px; }
+        .brand h1 { font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .brand p { color: var(--text-muted); font-size: 0.8rem; margin-top: 5px; letter-spacing: 1px; }
+
+        .input-group { margin-bottom: 18px; position: relative; }
+        .input-group label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; }
+        .input-icon { position: absolute; left: 14px; top: 42px; color: var(--text-muted); }
+        .auth-input { width: 100%; padding: 14px 14px 14px 42px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; color: white; font-size: 1rem; outline: none; transition: 0.3s; }
+        .auth-input:focus { border-color: var(--primary); box-shadow: 0 0 15px rgba(0,212,255,0.1); }
+
+        .btn-action { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--gradient); color: #000; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn-action:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,212,255,0.4); }
+        .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .auth-switch { text-align: center; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted); }
+        .auth-switch a { color: var(--primary); text-decoration: none; font-weight: 700; margin-left: 5px; }
+
+        .app-view { display: none; min-height: 100vh; padding-bottom: 110px; }
+
+        .top-nav { background: rgba(10,10,15,0.9); backdrop-filter: blur(15px); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); }
+        .nav-logo { font-weight: 800; font-size: 1.3rem; color: var(--primary); letter-spacing: 2px; }
+
+        .user-profile-display { display: flex; align-items: center; gap: 12px; }
+        .mem-tag { padding: 3px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; }
+        .mem-none { background: rgba(255,255,255,0.1); color: #fff; }
+        .mem-basic { background: linear-gradient(135deg, #636e72, #2d3436); color: white; }
+        .mem-premium { background: linear-gradient(135deg, #ffd700, #b8860b); color: black; }
+        .mem-vip { background: linear-gradient(135deg, #a855f7, #7c3aed); color: white; }
+        .mem-platinum { background: linear-gradient(135deg, #00d4ff, #0891b2); color: white; }
+        .mem-elite { background: linear-gradient(135deg, #ff4757, #c0392b); color: white; }
+        .user-avatar { width: 36px; height: 36px; border-radius: 10px; background: var(--gradient); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; color: #000; }
+
+        .main-area { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+        .panel-section { display: none; animation: fadeIn 0.3s; }
+        .panel-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .panel-header { margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .panel-title { font-size: 1.3rem; font-weight: 700; border-left: 3px solid var(--primary); padding-left: 10px; }
+
+        .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 25px; }
+        @media (max-width: 480px) { .card-grid { grid-template-columns: 1fr; } }
+
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; transition: 0.3s; }
+        .stat-card:hover { transform: translateY(-3px); border-color: var(--primary); }
+        .stat-card i { font-size: 1.5rem; color: var(--primary); margin-bottom: 10px; }
+        .stat-value { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
+
+        .hero-banner { background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(0,255,136,0.05)); border-radius: 20px; padding: 25px; margin-bottom: 25px; border: 1px solid rgba(0,212,255,0.2); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .hero-title { font-size: 1.6rem; font-weight: 800; margin-bottom: 5px; }
+        .hero-sub { color: var(--text-muted); font-size: 0.9rem; }
+
+        /* MEMBRESÍAS */
+        .mem-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 25px; }
+        @media (max-width: 950px) { .mem-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 600px) { .mem-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 400px) { .mem-grid { grid-template-columns: 1fr; } }
+
+        .mem-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 18px 12px; text-align: center; transition: 0.3s; cursor: pointer; position: relative; overflow: hidden; }
+        .mem-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .mem-card.selected { border-color: var(--accent); box-shadow: 0 0 25px rgba(0,255,136,0.4); }
+        .mem-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient); }
+        .mem-card.basic::before { background: linear-gradient(90deg, #636e72, #b2bec3); }
+        .mem-card.premium::before { background: linear-gradient(90deg, #ffd700, #f39c12); }
+        .mem-card.vip::before { background: linear-gradient(90deg, #a855f7, #7c3aed); }
+        .mem-card.platinum::before { background: linear-gradient(90deg, #00d4ff, #0891b2); }
+        .mem-card.elite::before { background: linear-gradient(90deg, #ff4757, #c0392b); }
+
+        .mem-name { font-size: 0.85rem; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .mem-card.basic .mem-name { color: #b2bec3; }
+        .mem-card.premium .mem-name { color: #ffd700; }
+        .mem-card.vip .mem-name { color: #a855f7; }
+        .mem-card.platinum .mem-name { color: #00d4ff; }
+        .mem-card.elite .mem-name { color: #ff4757; }
+
+        .mem-price { font-size: 1.4rem; font-weight: 800; margin: 8px 0; }
+        .mem-daily { font-size: 0.75rem; color: var(--accent); font-weight: 600; margin-bottom: 4px; }
+        .mem-roi { font-size: 0.8rem; color: var(--success); font-weight: 600; margin-bottom: 4px; }
+        .mem-withdraw { font-size: 0.7rem; color: var(--text-muted); }
+        .mem-bonus { font-size: 0.7rem; color: var(--warning); font-weight: 700; margin-top: 5px; }
+
+        .chart-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 25px; }
+        .chart-header { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .live-indicator { color: var(--accent); font-size: 0.8rem; display: flex; align-items: center; gap: 6px; }
+
+        .crypto-list { display: flex; flex-direction: column; gap: 10px; }
+        .crypto-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 15px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; cursor: pointer; }
+        .crypto-item:hover { background: var(--bg-panel); transform: translateX(5px); border-color: var(--primary); }
+        .crypto-left { display: flex; align-items: center; gap: 12px; }
+        .crypto-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; color: white; }
+        .crypto-info h4 { font-weight: 600; font-size: 0.95rem; }
+        .crypto-info p { font-size: 0.75rem; color: var(--text-muted); }
+        .crypto-right { text-align: right; }
+        .crypto-price { font-weight: 700; margin-bottom: 3px; }
+        .price-tag { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; }
+        .price-tag.up { background: rgba(0,255,136,0.15); color: var(--accent); }
+        .price-tag.down { background: rgba(255,71,87,0.15); color: var(--danger); }
+
+        .holdings-grid { display: flex; flex-direction: column; gap: 10px; }
+        .holding-row { background: var(--bg-card); border-radius: 12px; padding: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); }
+        .holding-row .val { font-weight: 700; font-size: 1.1rem; }
+        .holding-row .sub { font-size: 0.75rem; color: var(--text-muted); }
+        .holding-row.success { border-left: 3px solid var(--success); }
+        .holding-row.pending { border-left: 3px solid var(--warning); }
+
+        /* WALLET ADDRESS BOX */
+        .wallet-address-box { background: rgba(0,212,255,0.04); border: 1px solid rgba(0,212,255,0.2); border-radius: 14px; padding: 16px; margin-bottom: 20px; }
+        .wallet-address-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .wallet-address-label i { color: var(--primary); }
+        .wallet-address-value { font-family: 'Space Mono', monospace; font-size: 0.78rem; color: var(--primary); word-break: break-all; line-height: 1.5; }
+        .wallet-network-tag { display: inline-block; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); padding: 2px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 700; color: var(--primary); margin-top: 8px; }
+
+        /* BOTTOM NAV */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(14,14,20,0.97); padding: 10px 0 6px; border-top: 1px solid var(--border); z-index: 99; display: flex; justify-content: space-around; }
+        .nav-btn { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); font-size: 0.62rem; cursor: pointer; transition: 0.2s; background: none; border: none; outline: none; padding: 0 4px; }
+        .nav-btn i { font-size: 1.2rem; margin-bottom: 3px; }
+        .nav-btn.active { color: var(--primary); }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: center; padding: 20px; }
+        .modal-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; width: 100%; max-width: 400px; animation: popIn 0.3s; }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
+
+        .trade-tabs { display: flex; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 10px; margin-bottom: 20px; }
+        .trade-tab { flex: 1; padding: 10px; border: none; background: none; color: var(--text-muted); cursor: pointer; font-weight: 600; transition: 0.3s; border-radius: 8px; }
+        .trade-tab.active { background: var(--primary); color: #000; }
+
+        .balance-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; color: var(--text-muted); }
+        .balance-row span strong { color: white; }
+
+        .action-btn-group { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-half { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); color: white; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-half:hover { background: var(--primary); border-color: var(--primary); color: #000; }
+
+        .withdraw-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 15px; }
+        .withdraw-status { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; }
+        .status-badge.approved { background: rgba(0,255,136,0.15); color: var(--accent); }
+        .status-badge.pending { background: rgba(255,212,59,0.15); color: var(--warning); }
+        .withdraw-amount { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+
+        /* WITHDRAW AMOUNT BUTTONS */
+        .withdraw-amounts { display: flex; gap: 10px; margin-bottom: 8px; }
+        .amount-btn { flex: 1; padding: 12px 8px; border-radius: 12px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text-muted); font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.3s; text-align: center; }
+        .amount-btn:hover { border-color: var(--primary); color: var(--primary); background: rgba(0,212,255,0.06); }
+        .amount-btn.selected { border-color: var(--accent); color: var(--accent); background: rgba(0,255,136,0.08); box-shadow: 0 0 12px rgba(0,255,136,0.2); }
+        .amount-label { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* TRANSACTION FEE INFO */
+        .fee-info-box { background: rgba(255,212,59,0.05); border: 1px solid rgba(255,212,59,0.2); border-radius: 10px; padding: 12px; margin-bottom: 14px; font-size: 0.78rem; }
+        .fee-info-box .fee-row { display: flex; justify-content: space-between; padding: 4px 0; }
+        .fee-info-box .fee-label { color: var(--text-muted); }
+        .fee-info-box .fee-value { color: var(--warning); font-weight: 700; }
+        .fee-info-box .fee-net { color: var(--accent); font-weight: 700; }
+
+        /* LOCKED OVERLAY for crypto */
+        .locked-overlay { background: rgba(0,0,0,0.6); border: 1px dashed rgba(255,255,255,0.15); border-radius: 14px; padding: 30px; text-align: center; color: var(--text-muted); margin-bottom: 20px; }
+        .locked-overlay i { font-size: 2rem; color: var(--warning); margin-bottom: 10px; }
+        .locked-overlay p { font-size: 0.85rem; margin-top: 6px; }
+    </style>
+</head>
+<body>
+
+    <div class="loader-screen" id="loader">
+        <div class="spinner"></div>
+        <p class="loader-text">CONECTANDO A RED FNL...</p>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- AUTH -->
+    <div class="auth-view" id="authSection" style="display: none;">
+        <div class="auth-card">
+            <div class="brand">
+                <h1>FNL</h1>
+                <p>Financial Network Latino - Tu puerta a la riqueza</p>
+            </div>
+            <div class="input-group">
+                <label>Usuario</label>
+                <i class="fa-solid fa-user input-icon"></i>
+                <input type="text" class="auth-input" id="userIn" placeholder="Tu alias">
+            </div>
+            <div class="input-group">
+                <label>Contraseña</label>
+                <i class="fa-solid fa-lock input-icon"></i>
+                <input type="password" class="auth-input" id="passIn" placeholder="••••••••">
+            </div>
+            <button class="btn-action" id="authBtn" onclick="handleAuth()">Entrar a FNL</button>
+            <div class="auth-switch">
+                <span id="switchHint">¿Nuevo?</span> <a href="#" id="switchModeBtn" onclick="toggleAuthMode()">Crear Cuenta</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP -->
+    <div class="app-view" id="dashboard">
+        <nav class="top-nav">
+            <div class="nav-logo"><i class="fa-solid fa-chart-line"></i> FNL</div>
+            <div class="user-profile-display">
+                <div class="mem-tag mem-none" id="memBadge">NINGUNA</div>
+                <div class="user-avatar" id="avatarInit">U</div>
+            </div>
+        </nav>
+
+        <div class="main-area">
+
+            <!-- HOME -->
+            <div id="panel-home" class="panel-section active">
+                <div class="hero-banner">
+                    <div>
+                        <div class="hero-title">Hola, <span id="dispName">Usuario</span></div>
+                        <div class="hero-sub">Balance total: <strong id="totalBalance">0.00 USDT</strong></div>
+                    </div>
+                </div>
+
+                <div class="card-grid">
+                    <div class="stat-card">
+                        <i class="fa-solid fa-wallet"></i>
+                        <div class="stat-value" id="liqBalance">0.00 USDT</div>
+                        <div class="stat-label">Liquidez USDT</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fa-solid fa-gem"></i>
+                        <div class="stat-value" id="membership">NINGUNA</div>
+                        <div class="stat-label">Membresía Activa</div>
+                    </div>
+                </div>
+
+                <div class="chart-box">
+                    <div class="chart-header">
+                        <h3>Índice FNL (Mercado Real)</h3>
+                        <span class="live-indicator"><i class="fa-solid fa-circle"></i> EN VIVO</span>
+                    </div>
+                    <div style="height: 180px; position: relative; width: 100%;">
+                        <canvas id="mainChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="panel-header">
+                    <h3 class="panel-title">Mercados Cripto</h3>
+                </div>
+                <div class="crypto-list" id="cryptoListHome"></div>
+            </div>
+
+            <!-- MEMBRESÍAS -->
+            <div id="panel-memberships" class="panel-section">
+                <div class="panel-header">
+                    <h3 class="panel-title"><i class="fa-solid fa-crown" style="color: var(--primary); margin-right: 8px;"></i> Membresías FNL</h3>
+                </div>
+
+                <div class="stat-card" style="margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <div class="stat-label">Tu membresía actual</div>
+                        <div class="stat-value" id="membershipPanelActive" style="color: var(--primary);">NINGUNA</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="stat-label">Saldo disponible</div>
+                        <div class="stat-value" id="membershipPanelBalance" style="color: var(--accent);">0.00 USDT</div>
+                    </div>
+                </div>
+
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 18px; background: rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.1); border-radius: 12px; padding: 14px;">
+                    <i class="fa-solid fa-circle-info" style="color: var(--primary); margin-right: 6px;"></i>
+                    Elige tu plan, recibe un <strong style="color: var(--warning);">bono único</strong> al activarlo y genera ingresos estables según tu ciclo. El monto se descuenta de tu saldo líquido.
+                </div>
+
+                <div class="mem-grid">
+                    <div id="mem-basic" class="mem-card basic" onclick="buyMembership('basic')">
+                        <div class="mem-name">Basic</div>
+                        <div class="mem-price">$5</div>
+                        <div class="mem-daily">+$0.20/día</div>
+                        <div class="mem-roi">$6 c/30 días</div>
+                        <div class="mem-withdraw">Retiro: $6 c/30 días</div>
+                        <div class="mem-bonus">🎁 Bono: $0.35</div>
+                    </div>
+                    <div id="mem-premium" class="mem-card premium" onclick="buyMembership('premium')">
+                        <div class="mem-name">Premium</div>
+                        <div class="mem-price">$10</div>
+                        <div class="mem-daily">+$0.40/día</div>
+                        <div class="mem-roi">$12 c/30 días</div>
+                        <div class="mem-withdraw">Retiro: $12 c/30 días</div>
+                        <div class="mem-bonus">🎁 Bono: $0.70</div>
+                    </div>
+                    <div id="mem-vip" class="mem-card vip" onclick="buyMembership('vip')">
+                        <div class="mem-name">VIP</div>
+                        <div class="mem-price">$20</div>
+                        <div class="mem-daily">+$0.80/día</div>
+                        <div class="mem-roi">$24 c/25 días</div>
+                        <div class="mem-withdraw">Retiro: $24 c/25 días</div>
+                        <div class="mem-bonus">🎁 Bono: $1.40</div>
+                    </div>
+                    <div id="mem-platinum" class="mem-card platinum" onclick="buyMembership('platinum')">
+                        <div class="mem-name">Platinum</div>
+                        <div class="mem-price">$50</div>
+                        <div class="mem-daily">+$1.83/día</div>
+                        <div class="mem-roi">$55 c/25 días</div>
+                        <div class="mem-withdraw">Retiro: $55 c/25 días</div>
+                        <div class="mem-bonus">🎁 Bono: $3.50</div>
+                    </div>
+                    <div id="mem-elite" class="mem-card elite" onclick="buyMembership('elite')">
+                        <div class="mem-name">Elite</div>
+                        <div class="mem-price">$100</div>
+                        <div class="mem-daily">+$3.66/día</div>
+                        <div class="mem-roi">$110 c/25 días</div>
+                        <div class="mem-withdraw">Retiro: $110 c/25 días</div>
+                        <div class="mem-bonus">🎁 Bono: $7.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RETIROS -->
+            <div id="panel-withdraw" class="panel-section">
+                <div class="panel-header">
+                    <h3 class="panel-title">Retiros</h3>
+                </div>
+
+                <div class="withdraw-card">
+                    <div class="withdraw-status">
+                        <span style="color:var(--text-muted)">Estado de retiro:</span>
+                        <span class="status-badge pending" id="withdrawStatus">ESPERANDO MEMBRESÍA</span>
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">
+                        <i class="fa-solid fa-clock"></i> Tiempo restante del ciclo: <span id="withdrawTimer">--:--:--</span>
+                    </div>
+                    <div class="withdraw-amount" id="withdrawAmount">0.00 USDT</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 18px;">Monto disponible según tu plan activo</div>
+
+                    <div class="amount-label">Selecciona el monto a retirar</div>
+                    <div class="withdraw-amounts">
+                        <div class="amount-btn" id="amtBtn5"  onclick="selectWithdrawAmount(5)">$5</div>
+                        <div class="amount-btn" id="amtBtn15" onclick="selectWithdrawAmount(15)">$15</div>
+                        <div class="amount-btn" id="amtBtn60" onclick="selectWithdrawAmount(60)">$60</div>
+                    </div>
+
+                    <!-- TASA DE TRANSACCIÓN -->
+                    <div class="fee-info-box" id="feeInfoBox" style="display:none;">
+                        <div style="font-size: 0.75rem; color: var(--warning); font-weight: 700; margin-bottom: 6px;">
+                            <i class="fa-solid fa-circle-exclamation"></i> Tasa de Transacción
+                        </div>
+                        <div class="fee-row">
+                            <span class="fee-label">Monto solicitado:</span>
+                            <span class="fee-value" id="feeGross">$0.00</span>
+                        </div>
+                        <div class="fee-row">
+                            <span class="fee-label">Comisión de red:</span>
+                            <span class="fee-value" id="feeAmount">-$0.00</span>
+                        </div>
+                        <div class="fee-row" style="border-top: 1px solid rgba(255,255,255,0.05); margin-top: 4px; padding-top: 4px;">
+                            <span class="fee-label">Recibirás:</span>
+                            <span class="fee-net" id="feeNet">$0.00 USDT</span>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Dirección de Wallet (BTC/USDT/TRX)</label>
+                        <i class="fa-solid fa-key input-icon" style="top:38px;"></i>
+                        <input type="text" class="auth-input" id="withdrawWallet" placeholder="Ej: TBx9... o bc1q..." style="padding: 12px 12px 12px 42px;">
+                    </div>
+
+                    <button class="btn-action" style="margin-top:5px;" onclick="requestWithdrawal()">SOLICITAR RETIRO</button>
+                </div>
+
+                <div class="panel-header">
+                    <h3 class="panel-title">Historial de Retiros</h3>
+                </div>
+                <div class="holdings-grid" id="withdrawLog"></div>
+            </div>
+
+            <!-- WALLET -->
+            <div id="panel-portfolio" class="panel-section">
+                <div class="panel-header">
+                    <h3 class="panel-title">Mi Wallet</h3>
+                </div>
+
+                <!-- DIRECCIÓN DE TRANSFERENCIA BEP20 -->
+                <div class="wallet-address-box">
+                    <div class="wallet-address-label">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i> Dirección de depósito FNL
+                    </div>
+                    <div class="wallet-address-value">0x7d34506820fb566468cf41930fcaef81ca7a41a1</div>
+                    <div><span class="wallet-network-tag">BEP20 (BSC)</span></div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 8px;">
+                        <i class="fa-solid fa-triangle-exclamation" style="color: var(--warning);"></i>
+                        Envía únicamente USDT (BEP20) a esta dirección. Otra red puede causar pérdida de fondos.
+                    </div>
+                </div>
+
+                <div class="stat-card" style="margin-bottom: 20px; text-align: center;">
+                    <div class="stat-label">PATRIMONIO TOTAL</div>
+                    <div class="stat-value" style="font-size: 2rem; color: var(--accent);" id="patrimValue">0.00 USDT</div>
+                </div>
+
+                <div class="holdings-grid" id="portfolioList"></div>
+
+                <div id="tradeButtonWrapper" style="display:none;">
+                    <button class="btn-action" style="margin-top: 20px;" onclick="openTradeModal()">
+                        <i class="fa-solid fa-arrow-right-arrow-left"></i> Operar Activos
+                    </button>
+                </div>
+                <div id="tradeLockedMsg" class="locked-overlay" style="margin-top:20px;">
+                    <i class="fa-solid fa-lock"></i>
+                    <div style="font-weight: 700; margin-top: 8px;">Operaciones bloqueadas</div>
+                    <p>Adquiere una membresía para desbloquear las operaciones con criptomonedas.</p>
+                </div>
+            </div>
+
+            <!-- PERFIL -->
+            <div id="panel-profile" class="panel-section">
+                <div class="panel-header">
+                    <h3 class="panel-title">Mi Perfil</h3>
+                </div>
+
+                <div class="stat-card" style="margin-bottom: 20px; text-align: center;">
+                    <div class="user-avatar" style="width: 60px; height: 60px; font-size: 1.5rem; margin: 0 auto 10px;" id="profileAvatar">U</div>
+                    <div class="stat-value" id="profName">Usuario</div>
+                    <div class="stat-label">Inversor FNL</div>
+                </div>
+
+                <div class="card-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Membresía</div>
+                        <div class="stat-value" id="profileMem" style="font-size:1.1rem; color: var(--primary);">NINGUNA</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Bono de membresía</div>
+                        <div class="stat-value" id="profileBonusReceived" style="font-size:1.1rem; color: var(--accent);">$0.00</div>
+                    </div>
+                </div>
+
+                <div class="panel-header" style="margin-top: 20px;">
+                    <h3 class="panel-title">Historial de Transacciones</h3>
+                </div>
+                <div class="holdings-grid" id="historyLog" style="max-height: 250px; overflow-y: auto;"></div>
+
+                <button class="btn-action" style="background: var(--danger); margin-top: 30px;" onclick="logout()">
+                    <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+                </button>
+            </div>
+
+        </div>
+
+        <!-- BOTTOM NAV -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" onclick="switchPanel(this, 'home')">
+                <i class="fa-solid fa-house"></i> Inicio
+            </button>
+            <button class="nav-btn" onclick="switchPanel(this, 'memberships')">
+                <i class="fa-solid fa-crown"></i> Membresías
+            </button>
+            <button class="nav-btn" onclick="switchPanel(this, 'withdraw')">
+                <i class="fa-solid fa-money-bill-transfer"></i> Retiros
+            </button>
+            <button class="nav-btn" onclick="switchPanel(this, 'portfolio')">
+                <i class="fa-solid fa-wallet"></i> Wallet
+            </button>
+            <button class="nav-btn" onclick="switchPanel(this, 'profile')">
+                <i class="fa-solid fa-user"></i> Mi Perfil
+            </button>
+        </nav>
+    </div>
+
+    <!-- TRADE MODAL -->
+    <div class="modal-overlay" id="tradeModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="tradeTitle">Operar</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+
+            <div class="trade-tabs">
+                <button class="trade-tab active" id="tabBuy"  onclick="setMode('buy')">COMPRAR</button>
+                <button class="trade-tab"        id="tabSell" onclick="setMode('sell')">VENDER</button>
+            </div>
+
+            <div class="balance-row">
+                <span>Tu Liquidez USDT:</span>
+                <span><strong id="tradeBal">0.00</strong></span>
+            </div>
+
+            <div class="input-group" style="margin-bottom: 12px;">
+                <label>Seleccionar Activo</label>
+                <select id="tradeAssetSelect" class="auth-input" style="padding: 12px; appearance: none; background-color: rgba(255,255,255,0.05); cursor: pointer;" onchange="updateTradeModalAsset()"></select>
+            </div>
+
+            <div class="balance-row">
+                <span>Precio actual:</span>
+                <span><strong id="tradePrice">$0.00</strong></span>
+            </div>
+
+            <div class="input-group" style="margin-top: 15px;">
+                <label id="tradeInputLabel">Monto USDT</label>
+                <input type="number" class="auth-input" id="tradeInput" placeholder="0.00" oninput="calcConv()" style="padding-left: 15px;">
+            </div>
+
+            <div class="balance-row" style="background: rgba(255,255,255,0.02); padding: 10px; border-radius: 8px;">
+                <span id="labelResultType">Recibes:</span>
+                <span id="tradeOut" style="color: var(--primary); font-weight: bold;">0.00</span>
+            </div>
+
+            <div class="action-btn-group">
+                <button class="btn-half" style="background: var(--primary); border:none; color:#000;" onclick="execTrade()">CONFIRMAR</button>
+                <button class="btn-half" onclick="closeModal()">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DB_KEY = 'fnl_users_db';
+
+        // memberships: days = ciclo de retiro
+        const memberships = {
+            basic:    { name: 'Basic',    price: 5,   daily: 0.20, withdraw: 6,   days: 30, bonus: 0.35  },
+            premium:  { name: 'Premium',  price: 10,  daily: 0.40, withdraw: 12,  days: 30, bonus: 0.70  },
+            vip:      { name: 'VIP',      price: 20,  daily: 0.80, withdraw: 24,  days: 25, bonus: 1.40  },
+            platinum: { name: 'Platinum', price: 50,  daily: 1.83, withdraw: 55,  days: 25, bonus: 3.50  },
+            elite:    { name: 'Elite',    price: 100, daily: 3.66, withdraw: 110, days: 25, bonus: 7.00  }
+        };
+
+        // Tasas de transacción
+        const withdrawFees = { 5: 0.50, 15: 2.00, 60: 5.00 };
+        const withdrawNet  = { 5: 4.50, 15: 13.00, 60: 55.00 };
+
+        let cryptoData = [
+            { id: 'btc', name: 'Bitcoin',  symbol: 'BTC', price: 67432.18, change: 0.8,  color: '#f7931a', icon: '₿' },
+            { id: 'eth', name: 'Ethereum', symbol: 'ETH', price: 3521.44,  change: -0.3, color: '#627eea', icon: 'Ξ' },
+            { id: 'sol', name: 'Solana',   symbol: 'SOL', price: 148.72,   change: 2.5,  color: '#14f195', icon: 'S' },
+            { id: 'bnb', name: 'BNB',      symbol: 'BNB', price: 605.30,   change: 1.2,  color: '#f3ba2f', icon: 'B' },
+            { id: 'xrp', name: 'XRP',      symbol: 'XRP', price: 0.5218,   change: -1.5, color: '#23292f', icon: 'X' }
+        ];
+
+        let user = null;
+        let isRegister = false;
+        let activeCrypto = 'btc';
+        let tradeMode = 'buy';
+        let chartInstance = null;
+        let priceHistory = Array.from({length: 10}, () => Math.floor(Math.random() * (120 - 90) + 90));
+        let selectedWithdrawAmount = null;
+
+        window.onload = () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+                const saved = localStorage.getItem('fnl_active_user');
+                if (saved) {
+                    const db = JSON.parse(localStorage.getItem(DB_KEY)) || {};
+                    user = db[saved.toLowerCase()];
+                    if (user) showDash();
+                    else document.getElementById('authSection').style.display = 'flex';
+                } else {
+                    document.getElementById('authSection').style.display = 'flex';
+                }
+            }, 1200);
+        };
+
+        function toggleAuthMode() {
+            isRegister = !isRegister;
+            document.getElementById('authBtn').innerText = isRegister ? "CREAR CUENTA" : "ENTRAR A FNL";
+            document.getElementById('switchHint').innerText = isRegister ? "¿Ya tienes cuenta?" : "¿Nuevo?";
+            document.getElementById('switchModeBtn').innerText = isRegister ? "Iniciar Sesión" : "Crear Cuenta";
+        }
+
+        function handleAuth() {
+            const u = document.getElementById('userIn').value.trim();
+            const p = document.getElementById('passIn').value;
+            if (!u || !p) return showToast('error', 'Completa todos los campos');
+            const db = JSON.parse(localStorage.getItem(DB_KEY)) || {};
+
+            if (isRegister) {
+                if (db[u.toLowerCase()]) return showToast('error', 'El usuario ya existe');
+                user = {
+                    username: u, password: p, balance: 0.00, membership: null, membershipBuyTime: null,
+                    bonusReceived: 0, bonusClaimCount: 0,
+                    holdings: { btc: 0, eth: 0, sol: 0, bnb: 0, xrp: 0 },
+                    tx: [], withdrawals: [], joinDate: new Date().toLocaleDateString()
+                };
+                db[u.toLowerCase()] = user;
+                localStorage.setItem(DB_KEY, JSON.stringify(db));
+                showToast('success', '¡Cuenta creada! Adquiere una membresía para comenzar.');
+                isRegister = false; toggleAuthMode();
+            } else {
+                if (!db[u.toLowerCase()] || db[u.toLowerCase()].password !== p) {
+                    return showToast('error', 'Credenciales incorrectas');
+                }
+                user = db[u.toLowerCase()];
+                localStorage.setItem(DB_KEY, JSON.stringify(db));
+                localStorage.setItem('fnl_active_user', u.toLowerCase());
+                showDash();
+            }
+        }
+
+        function saveUserData() {
+            if (!user) return;
+            const db = JSON.parse(localStorage.getItem(DB_KEY)) || {};
+            db[user.username.toLowerCase()] = user;
+            localStorage.setItem(DB_KEY, JSON.stringify(db));
+        }
+
+        function showDash() {
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('dispName').innerText = user.username;
+            document.getElementById('profName').innerText = user.username;
+            document.getElementById('avatarInit').innerText = user.username.charAt(0).toUpperCase();
+            document.getElementById('profileAvatar').innerText = user.username.charAt(0).toUpperCase();
+
+            const selectEl = document.getElementById('tradeAssetSelect');
+            selectEl.innerHTML = '';
+            cryptoData.forEach(asset => {
+                const opt = document.createElement('option');
+                opt.value = asset.id;
+                opt.innerText = `${asset.name} (${asset.symbol})`;
+                selectEl.appendChild(opt);
+            });
+            activeCrypto = cryptoData[0].id;
+
+            updateUI();
+            initChart();
+            startMarketLoop();
+            startWithdrawTimer();
+        }
+
+        function switchPanel(btn, panelId) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.panel-section').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(`panel-${panelId}`).classList.add('active');
+            updateUI();
+        }
+
+        function formatUSDT(num) {
+            return (num || 0).toFixed(2) + ' USDT';
+        }
+        function formatUSD(num) {
+            return '$' + (num || 0).toFixed(2);
+        }
+
+        function calculateCryptoWealth() {
+            let wealth = 0;
+            cryptoData.forEach(asset => {
+                wealth += (user.holdings[asset.id] || 0) * asset.price;
+            });
+            return wealth;
+        }
+
+        function updateUI() {
+            if (!user) return;
+
+            const cryptoWealth = calculateCryptoWealth();
+            const total = user.balance + cryptoWealth;
+
+            document.getElementById('liqBalance').innerText = formatUSDT(user.balance);
+            document.getElementById('totalBalance').innerText = formatUSDT(total);
+            document.getElementById('patrimValue').innerText = formatUSDT(total);
+            document.getElementById('tradeBal').innerText = formatUSDT(user.balance);
+
+            if (document.getElementById('membershipPanelBalance'))
+                document.getElementById('membershipPanelBalance').innerText = formatUSDT(user.balance);
+
+            const badge   = document.getElementById('memBadge');
+            const memText = document.getElementById('membership');
+            badge.className = "mem-tag";
+            document.querySelectorAll('.mem-card').forEach(c => c.classList.remove('selected'));
+
+            if (user.membership) {
+                const plan = user.membership;
+                badge.innerText = plan.toUpperCase();
+                badge.classList.add(`mem-${plan}`);
+                memText.innerText = plan.toUpperCase();
+                const activeCard = document.getElementById(`mem-${plan}`);
+                if (activeCard) activeCard.classList.add('selected');
+                document.getElementById('profileMem').innerText = plan.toUpperCase();
+                if (document.getElementById('membershipPanelActive'))
+                    document.getElementById('membershipPanelActive').innerText = plan.toUpperCase();
+            } else {
+                badge.innerText = "NINGUNA";
+                badge.classList.add('mem-none');
+                memText.innerText = "NINGUNA";
+                document.getElementById('profileMem').innerText = "NINGUNA";
+                if (document.getElementById('membershipPanelActive'))
+                    document.getElementById('membershipPanelActive').innerText = "NINGUNA";
+            }
+
+            document.getElementById('profileBonusReceived').innerText = formatUSD(user.bonusReceived || 0);
+
+            // Toggle trade button vs locked msg
+            const hasMem = !!user.membership;
+            document.getElementById('tradeButtonWrapper').style.display = hasMem ? 'block' : 'none';
+            document.getElementById('tradeLockedMsg').style.display    = hasMem ? 'none'  : 'block';
+
+            // Crypto list
+            const listHome = document.getElementById('cryptoListHome');
+            listHome.innerHTML = '';
+            cryptoData.forEach(asset => {
+                const card = document.createElement('div');
+                card.className = 'crypto-item';
+                card.onclick = () => {
+                    if (!user.membership) return showToast('error', 'Necesitas una membresía para operar.');
+                    activeCrypto = asset.id;
+                    openTradeModal();
+                };
+                const changeClass = asset.change >= 0 ? 'up' : 'down';
+                const sign = asset.change >= 0 ? '+' : '';
+                card.innerHTML = `
+                    <div class="crypto-left">
+                        <div class="crypto-icon" style="background: ${asset.color}">${asset.icon}</div>
+                        <div class="crypto-info"><h4>${asset.name}</h4><p>${asset.symbol}</p></div>
+                    </div>
+                    <div class="crypto-right">
+                        <div class="crypto-price">${formatUSD(asset.price)}</div>
+                        <span class="price-tag ${changeClass}">${sign}${asset.change.toFixed(2)}%</span>
+                    </div>
+                `;
+                listHome.appendChild(card);
+            });
+
+            // Portfolio
+            const portList = document.getElementById('portfolioList');
+            portList.innerHTML = '';
+            const liqRow = document.createElement('div');
+            liqRow.className = 'holding-row success';
+            liqRow.innerHTML = `<div><div style="font-weight:600;">Saldo Líquido USDT</div><div class="sub">Listo para operar o comprar membresía</div></div><div class="val">${formatUSDT(user.balance)}</div>`;
+            portList.appendChild(liqRow);
+
+            cryptoData.forEach(asset => {
+                const amount = user.holdings[asset.id] || 0;
+                if (amount > 0) {
+                    const row = document.createElement('div');
+                    row.className = 'holding-row';
+                    row.innerHTML = `<div><div style="font-weight:600;">${asset.name} (${asset.symbol})</div><div class="sub">Cant: ${amount.toFixed(6)} • Precio: ${formatUSD(asset.price)}</div></div><div class="val" style="text-align:right;"><div>${formatUSDT(amount * asset.price)}</div><div class="sub">${amount.toFixed(4)} ${asset.symbol}</div></div>`;
+                    portList.appendChild(row);
+                }
+            });
+
+            // Historial
+            const histLog = document.getElementById('historyLog');
+            histLog.innerHTML = '';
+            if (!user.tx || user.tx.length === 0) {
+                histLog.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.85rem;">No tienes transacciones registradas.</div>`;
+            } else {
+                user.tx.slice().reverse().forEach(t => {
+                    const el = document.createElement('div');
+                    el.className = 'holding-row';
+                    el.innerHTML = `<div><div style="font-weight:600;font-size:0.9rem;">${t.desc}</div><div class="sub" style="font-size:0.7rem;">${t.date}</div></div><div class="val" style="color:${t.type === 'gain' || t.type === 'bonus' ? 'var(--accent)' : 'inherit'};font-size:0.95rem;">${t.type === 'spend' ? '-' : '+'}${formatUSD(t.amount)}</div>`;
+                    histLog.appendChild(el);
+                });
+            }
+
+            updateWithdrawSection();
+        }
+
+        function buyMembership(tier) {
+            const plan = memberships[tier];
+            if (!plan) return;
+
+            if (user.membership === tier) return showToast('info', `Ya tienes activa la membresía ${plan.name}`);
+            if (user.balance < plan.price) return showToast('error', `Saldo insuficiente. Necesitas ${formatUSD(plan.price)} USDT.`);
+
+            const confirmBuy = confirm(`¿Activar membresía ${plan.name} por ${formatUSD(plan.price)} USDT?\nRecibirás un bono único de ${formatUSD(plan.bonus)} USDT.`);
+            if (!confirmBuy) return;
+
+            user.balance -= plan.price;
+            user.balance += plan.bonus;           // bono único inmediato
+            user.bonusReceived = (user.bonusReceived || 0) + plan.bonus;
+            user.membership = tier;
+            user.membershipBuyTime = Date.now();
+
+            user.tx.push({ desc: `Compra Membresía ${plan.name}`, amount: plan.price, type: 'spend', date: new Date().toLocaleString() });
+            user.tx.push({ desc: `🎁 Bono Membresía ${plan.name}`, amount: plan.bonus, type: 'bonus', date: new Date().toLocaleString() });
+
+            saveUserData();
+            updateUI();
+            showToast('success', `¡Membresía ${plan.name} activada! Bono de ${formatUSD(plan.bonus)} USDT recibido.`);
+        }
+
+        // ── SELECCIÓN DE MONTO CON TASA ──
+        function selectWithdrawAmount(amount) {
+            selectedWithdrawAmount = amount;
+            document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById(`amtBtn${amount}`).classList.add('selected');
+
+            const fee = withdrawFees[amount];
+            const net = withdrawNet[amount];
+            document.getElementById('feeInfoBox').style.display = 'block';
+            document.getElementById('feeGross').innerText  = formatUSD(amount);
+            document.getElementById('feeAmount').innerText = '-' + formatUSD(fee);
+            document.getElementById('feeNet').innerText    = formatUSD(net) + ' USDT';
+        }
+
+        function updateWithdrawSection() {
+            const statusBadge     = document.getElementById('withdrawStatus');
+            const withdrawAmountEl = document.getElementById('withdrawAmount');
+
+            if (!user.membership) {
+                statusBadge.innerText = 'SIN PLAN ACTIVO';
+                statusBadge.className = 'status-badge pending';
+                withdrawAmountEl.innerText = '0.00 USDT';
+                document.getElementById('withdrawLog').innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.85rem;">No tienes retiros procesados.</div>`;
+                return;
+            }
+
+            const plan = memberships[user.membership];
+            const msPassed   = Date.now() - (user.membershipBuyTime || Date.now());
+            const msCycle    = plan.days * 24 * 60 * 60 * 1000;
+
+            if (msPassed >= msCycle) {
+                statusBadge.innerText = 'DISPONIBLE';
+                statusBadge.className = 'status-badge approved';
+            } else {
+                statusBadge.innerText = 'BLOQUEADO';
+                statusBadge.className = 'status-badge pending';
+            }
+            withdrawAmountEl.innerText = formatUSDT(plan.withdraw);
+
+            const withdrawLog = document.getElementById('withdrawLog');
+            withdrawLog.innerHTML = '';
+            if (!user.withdrawals || user.withdrawals.length === 0) {
+                withdrawLog.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.85rem;">No tienes retiros procesados.</div>`;
+            } else {
+                user.withdrawals.forEach(w => {
+                    const item = document.createElement('div');
+                    item.className = 'holding-row success';
+                    item.innerHTML = `<div><div style="font-weight:600;">Retiro Procesado</div><div class="sub">A: ${w.wallet.substring(0,6)}...${w.wallet.substring(w.wallet.length-4)}</div><div class="sub" style="font-size:0.65rem;">${w.date}</div></div><div class="val" style="color:var(--accent);">${formatUSD(w.net)} USDT</div>`;
+                    withdrawLog.appendChild(item);
+                });
+            }
+        }
+
+        function startWithdrawTimer() {
+            setInterval(() => {
+                const timerEl = document.getElementById('withdrawTimer');
+                if (!user || !user.membership || !user.membershipBuyTime) { timerEl.innerText = '--:--:--'; return; }
+
+                const plan    = memberships[user.membership];
+                const msCycle = plan.days * 24 * 60 * 60 * 1000;
+                const elapsed  = Date.now() - user.membershipBuyTime;
+                const remaining = msCycle - elapsed;
+
+                if (remaining <= 0) {
+                    timerEl.innerText = '¡Ciclo completado! Puedes retirar.';
+                } else {
+                    const days  = Math.floor(remaining / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const mins  = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                    const secs  = Math.floor((remaining % (1000 * 60)) / 1000);
+                    timerEl.innerText = `${days}d ${hours}h ${mins}m ${secs}s`;
+                }
+            }, 1000);
+        }
+
+        function requestWithdrawal() {
+            if (!user.membership) return showToast('error', 'Debes adquirir una membresía para habilitar retiros.');
+
+            const plan    = memberships[user.membership];
+            const msCycle = plan.days * 24 * 60 * 60 * 1000;
+            const elapsed  = Date.now() - user.membershipBuyTime;
+            if (elapsed < msCycle) return showToast('error', 'El ciclo aún no ha concluido.');
+
+            if (!selectedWithdrawAmount) return showToast('error', 'Por favor selecciona un monto ($5, $15 o $60).');
+
+            const walletAddr = document.getElementById('withdrawWallet').value.trim();
+            if (!walletAddr || walletAddr.length < 10) return showToast('error', 'Dirección de Wallet no válida.');
+
+            const gross = selectedWithdrawAmount;
+            const fee   = withdrawFees[gross];
+            const net   = withdrawNet[gross];
+
+            user.withdrawals.push({ amount: gross, fee: fee, net: net, wallet: walletAddr, date: new Date().toLocaleString() });
+            user.tx.push({ desc: `Retiro ${formatUSD(gross)} (comisión ${formatUSD(fee)})`, amount: gross, type: 'spend', date: new Date().toLocaleString() });
+            user.membershipBuyTime = Date.now();   // reset ciclo
+
+            saveUserData();
+            updateUI();
+
+            selectedWithdrawAmount = null;
+            document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById('feeInfoBox').style.display = 'none';
+            document.getElementById('withdrawWallet').value = '';
+            showToast('success', `Retiro de ${formatUSD(gross)} solicitado. Recibirás ${formatUSD(net)} USDT.`);
+        }
+
+        function openTradeModal() {
+            if (!user.membership) return showToast('error', 'Necesitas una membresía para operar.');
+            const modal = document.getElementById('tradeModal');
+            modal.style.display = 'flex';
+            document.getElementById('tradeAssetSelect').value = activeCrypto;
+            updateTradeModalAsset();
+        }
+
+        function updateTradeModalAsset() {
+            const selectVal = document.getElementById('tradeAssetSelect').value;
+            activeCrypto = selectVal;
+            const asset = cryptoData.find(a => a.id === activeCrypto);
+            document.getElementById('tradeTitle').innerText = `Operar ${asset.name}`;
+            document.getElementById('tradePrice').innerText = formatUSD(asset.price);
+            document.getElementById('tradeInput').value = '';
+            document.getElementById('tradeOut').innerText = '0.00';
+            setMode(tradeMode);
+        }
+
+        function closeModal() { document.getElementById('tradeModal').style.display = 'none'; }
+
+        function setMode(mode) {
+            tradeMode = mode;
+            document.getElementById('tabBuy').className  = `trade-tab ${mode === 'buy'  ? 'active' : ''}`;
+            document.getElementById('tabSell').className = `trade-tab ${mode === 'sell' ? 'active' : ''}`;
+            const asset = cryptoData.find(a => a.id === activeCrypto);
+            if (mode === 'buy') {
+                document.getElementById('tradeInputLabel').innerText = 'Monto USDT a gastar';
+                document.getElementById('labelResultType').innerText = 'Recibes (Cripto):';
+                document.getElementById('tradeBal').innerText = formatUSDT(user.balance);
+            } else {
+                document.getElementById('tradeInputLabel').innerText = `Monto de ${asset.symbol} a vender`;
+                document.getElementById('labelResultType').innerText = 'Recibes (USDT):';
+                document.getElementById('tradeBal').innerText = `${user.holdings[activeCrypto] || 0} ${asset.symbol}`;
+            }
+            calcConv();
+        }
+
+        function calcConv() {
+            const inputVal = parseFloat(document.getElementById('tradeInput').value) || 0;
+            const asset = cryptoData.find(a => a.id === activeCrypto);
+            const outEl = document.getElementById('tradeOut');
+            if (tradeMode === 'buy') {
+                outEl.innerText = `${(inputVal / asset.price).toFixed(6)} ${asset.symbol}`;
+            } else {
+                outEl.innerText = formatUSDT(inputVal * asset.price);
+            }
+        }
+
+        function execTrade() {
+            const inputVal = parseFloat(document.getElementById('tradeInput').value) || 0;
+            if (inputVal <= 0) return showToast('error', 'Ingresa una cantidad válida');
+            const asset = cryptoData.find(a => a.id === activeCrypto);
+
+            if (tradeMode === 'buy') {
+                if (user.balance < inputVal) return showToast('error', 'Saldo USDT insuficiente');
+                const received = inputVal / asset.price;
+                user.balance -= inputVal;
+                user.holdings[activeCrypto] = (user.holdings[activeCrypto] || 0) + received;
+                user.tx.push({ desc: `Comprado ${received.toFixed(6)} ${asset.symbol}`, amount: inputVal, type: 'spend', date: new Date().toLocaleString() });
+                showToast('success', `Compraste ${received.toFixed(6)} ${asset.symbol}`);
+            } else {
+                const owned = user.holdings[activeCrypto] || 0;
+                if (owned < inputVal) return showToast('error', `No tienes suficiente ${asset.symbol}`);
+                const receivedUSDT = inputVal * asset.price;
+                user.holdings[activeCrypto] = owned - inputVal;
+                user.balance += receivedUSDT;
+                user.tx.push({ desc: `Vendido ${inputVal.toFixed(6)} ${asset.symbol}`, amount: receivedUSDT, type: 'gain', date: new Date().toLocaleString() });
+                showToast('success', `Vendiste ${inputVal.toFixed(6)} ${asset.symbol} por ${formatUSDT(receivedUSDT)}`);
+            }
+
+            saveUserData();
+            closeModal();
+            updateUI();
+        }
+
+        function showToast(type, text) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            let icon = 'fa-circle-info';
+            if (type === 'success') icon = 'fa-circle-check';
+            if (type === 'error')   icon = 'fa-triangle-exclamation';
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i><span>${text}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'slideIn 0.3s ease reverse forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 10}, (_, i) => `T-${10 - i}`),
+                    datasets: [{
+                        label: 'FNL Index',
+                        data: priceHistory,
+                        borderColor: '#00d4ff',
+                        backgroundColor: 'rgba(0,212,255,0.05)',
+                        fill: true, tension: 0.4, borderWidth: 2, pointRadius: 2
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#6b6b7a', font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        function startMarketLoop() {
+            setInterval(() => {
+                cryptoData.forEach(asset => {
+                    // Volatilidad realista: ±0.3% max por tick
+                    const volatility = asset.id === 'sol' || asset.id === 'xrp' ? 0.003 : 0.0015;
+                    const changePct = (Math.random() * 2 - 1) * volatility;
+                    asset.price = Math.max(0.01, asset.price * (1 + changePct));
+                    asset.change = changePct * 100;
+                });
+
+                const avgPrice = cryptoData.reduce((acc, curr) => acc + curr.price, 0) / 1000;
+                priceHistory.push(avgPrice);
+                if (priceHistory.length > 10) priceHistory.shift();
+
+                if (chartInstance) {
+                    chartInstance.data.datasets[0].data = priceHistory;
+                    chartInstance.update();
+                }
+
+                if (document.getElementById('tradeModal').style.display === 'flex') {
+                    const asset = cryptoData.find(a => a.id === activeCrypto);
+                    document.getElementById('tradePrice').innerText = formatUSD(asset.price);
+                    calcConv();
+                }
+
+                updateUI();
+            }, 6000);
+        }
+
+        function logout() {
+            localStorage.removeItem('fnl_active_user');
+            user = null;
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('authSection').style.display = 'flex';
+            showToast('info', 'Sesión cerrada');
+        }
+    </script>
+</body>
+</html>
