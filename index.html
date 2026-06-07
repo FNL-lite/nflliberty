@@ -6,7 +6,7 @@
     <title>FNL | Financial Network Latino</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -15,1301 +15,1757 @@
             --primary-dark: #00a8cc;
             --secondary: #ff6b6b;
             --accent: #00ff88;
-            --bg-dark: #050508;
-            --bg-panel: #0a0a12;
-            --bg-card: #101018;
-            --text: #ffffff;
-            --text-muted: #6b6b7a;
+            --bg-dark: #04040a;
+            --bg-panel: #08080f;
+            --bg-card: #0d0d18;
+            --bg-card2: #111120;
+            --text: #f0f0ff;
+            --text-muted: #5a5a72;
             --success: #00ff88;
             --danger: #ff4757;
             --warning: #ffd43b;
-            --border: rgba(255,255,255,0.06);
-            --gradient: linear-gradient(135deg, var(--primary), #00ff88);
+            --border: rgba(255,255,255,0.07);
+            --border2: rgba(0,212,255,0.15);
+            --gradient: linear-gradient(135deg, #00d4ff, #00ff88);
+            --gradient2: linear-gradient(135deg, #00d4ff 0%, #7b2ff7 100%);
             --admin-primary: #ff6b35;
-            --admin-bg: #0a0806;
+            --admin-bg: #080604;
+            --glow: 0 0 30px rgba(0,212,255,0.15);
         }
- 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; user-select: none; }
-        body { background: var(--bg-dark); color: var(--text); min-height: 100vh; overflow-x: hidden; }
-        ::-webkit-scrollbar { width: 6px; }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg-dark); color: var(--text); min-height:100vh; overflow-x:hidden; }
+        h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
+        code, .mono { font-family: 'DM Mono', monospace; }
+
+        ::-webkit-scrollbar { width:5px; }
         ::-webkit-scrollbar-track { background: var(--bg-dark); }
-        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
- 
-        .loader-screen { position: fixed; inset: 0; background: var(--bg-dark); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s; }
-        .loader-screen.hidden { opacity: 0; pointer-events: none; }
-        .spinner { width: 60px; height: 60px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loader-text { margin-top: 15px; color: var(--primary); font-family: 'Space Mono'; letter-spacing: 2px; font-size: 0.8rem; }
- 
-        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
-        .toast { background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--primary); padding: 14px 18px; border-radius: 10px; min-width: 300px; display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s ease forwards; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .toast.success { border-left-color: var(--success); }
-        .toast.error { border-left-color: var(--danger); }
-        .toast.info { border-left-color: var(--primary); }
-        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
- 
-        /* ══════════════════ AUTH ══════════════════ */
-        .auth-view { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at top, rgba(0,212,255,0.15), transparent 60%), var(--bg-dark); padding: 20px; }
-        .auth-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 24px; padding: 40px; width: 100%; max-width: 400px; backdrop-filter: blur(20px); box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
-        .brand { text-align: center; margin-bottom: 30px; }
-        .brand h1 { font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: default; }
-        .brand p { color: var(--text-muted); font-size: 0.8rem; margin-top: 5px; letter-spacing: 1px; }
- 
-        .input-group { margin-bottom: 18px; position: relative; }
-        .input-group label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; }
-        .input-icon { position: absolute; left: 14px; top: 42px; color: var(--text-muted); }
-        .auth-input { width: 100%; padding: 14px 14px 14px 42px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; color: white; font-size: 1rem; outline: none; transition: 0.3s; }
-        .auth-input:focus { border-color: var(--primary); box-shadow: 0 0 15px rgba(0,212,255,0.1); }
- 
-        .btn-action { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--gradient); color: #000; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        .btn-action:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,212,255,0.4); }
-        .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
- 
-        .auth-switch { text-align: center; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted); }
-        .auth-switch a { color: var(--primary); text-decoration: none; font-weight: 700; margin-left: 5px; }
- 
-        /* ══════════════════ APP ══════════════════ */
-        .app-view { display: none; min-height: 100vh; padding-bottom: 110px; }
-        .top-nav { background: rgba(10,10,15,0.9); backdrop-filter: blur(15px); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); }
-        .nav-logo { font-weight: 800; font-size: 1.3rem; color: var(--primary); letter-spacing: 2px; }
- 
-        .user-profile-display { display: flex; align-items: center; gap: 12px; }
-        .mem-tag { padding: 3px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; }
-        .mem-none { background: rgba(255,255,255,0.1); color: #fff; }
-        .mem-basic { background: linear-gradient(135deg, #636e72, #2d3436); color: white; }
-        .mem-premium { background: linear-gradient(135deg, #ffd700, #b8860b); color: black; }
-        .mem-vip { background: linear-gradient(135deg, #a855f7, #7c3aed); color: white; }
-        .mem-platinum { background: linear-gradient(135deg, #00d4ff, #0891b2); color: white; }
-        .mem-elite { background: linear-gradient(135deg, #ff4757, #c0392b); color: white; }
-        .user-avatar { width: 36px; height: 36px; border-radius: 10px; background: var(--gradient); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; color: #000; }
- 
-        .main-area { max-width: 900px; margin: 0 auto; padding: 20px; }
-        .panel-section { display: none; animation: fadeIn 0.3s; }
-        .panel-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .panel-header { margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .panel-title { font-size: 1.3rem; font-weight: 700; border-left: 3px solid var(--primary); padding-left: 10px; }
- 
-        .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 25px; }
-        @media (max-width: 480px) { .card-grid { grid-template-columns: 1fr; } }
- 
-        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; transition: 0.3s; }
-        .stat-card:hover { transform: translateY(-3px); border-color: var(--primary); }
-        .stat-card i { font-size: 1.5rem; color: var(--primary); margin-bottom: 10px; }
-        .stat-value { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
-        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
- 
-        .hero-banner { background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(0,255,136,0.05)); border-radius: 20px; padding: 25px; margin-bottom: 25px; border: 1px solid rgba(0,212,255,0.2); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
-        .hero-title { font-size: 1.6rem; font-weight: 800; margin-bottom: 5px; }
-        .hero-sub { color: var(--text-muted); font-size: 0.9rem; }
- 
-        /* MEMBRESÍAS */
-        .mem-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 25px; }
-        @media (max-width: 950px) { .mem-grid { grid-template-columns: repeat(3, 1fr); } }
-        @media (max-width: 600px) { .mem-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 400px) { .mem-grid { grid-template-columns: 1fr; } }
- 
-        .mem-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 18px 12px; text-align: center; transition: 0.3s; cursor: pointer; position: relative; overflow: hidden; }
-        .mem-card:hover { transform: translateY(-5px); border-color: var(--primary); }
-        .mem-card.selected { border-color: var(--accent); box-shadow: 0 0 25px rgba(0,255,136,0.4); }
-        .mem-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient); }
-        .mem-card.basic::before { background: linear-gradient(90deg, #636e72, #b2bec3); }
-        .mem-card.premium::before { background: linear-gradient(90deg, #ffd700, #f39c12); }
-        .mem-card.vip::before { background: linear-gradient(90deg, #a855f7, #7c3aed); }
-        .mem-card.platinum::before { background: linear-gradient(90deg, #00d4ff, #0891b2); }
-        .mem-card.elite::before { background: linear-gradient(90deg, #ff4757, #c0392b); }
-        .mem-name { font-size: 0.85rem; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-        .mem-card.basic .mem-name { color: #b2bec3; }
-        .mem-card.premium .mem-name { color: #ffd700; }
-        .mem-card.vip .mem-name { color: #a855f7; }
-        .mem-card.platinum .mem-name { color: #00d4ff; }
-        .mem-card.elite .mem-name { color: #ff4757; }
-        .mem-price { font-size: 1.4rem; font-weight: 800; margin: 8px 0; }
-        .mem-daily { font-size: 0.75rem; color: var(--accent); font-weight: 600; margin-bottom: 4px; }
-        .mem-roi { font-size: 0.8rem; color: var(--success); font-weight: 600; margin-bottom: 4px; }
-        .mem-withdraw { font-size: 0.7rem; color: var(--text-muted); }
-        .mem-bonus { font-size: 0.7rem; color: var(--warning); font-weight: 700; margin-top: 5px; }
- 
-        .chart-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 25px; }
-        .chart-header { display: flex; justify-content: space-between; margin-bottom: 15px; }
-        .live-indicator { color: var(--accent); font-size: 0.8rem; display: flex; align-items: center; gap: 6px; }
- 
-        .crypto-list { display: flex; flex-direction: column; gap: 10px; }
-        .crypto-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 15px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; cursor: pointer; }
-        .crypto-item:hover { background: var(--bg-panel); transform: translateX(5px); border-color: var(--primary); }
-        .crypto-left { display: flex; align-items: center; gap: 12px; }
-        .crypto-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; color: white; }
-        .crypto-info h4 { font-weight: 600; font-size: 0.95rem; }
-        .crypto-info p { font-size: 0.75rem; color: var(--text-muted); }
-        .crypto-right { text-align: right; }
-        .crypto-price { font-weight: 700; margin-bottom: 3px; }
-        .price-tag { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; }
-        .price-tag.up { background: rgba(0,255,136,0.15); color: var(--accent); }
-        .price-tag.down { background: rgba(255,71,87,0.15); color: var(--danger); }
- 
-        .holdings-grid { display: flex; flex-direction: column; gap: 10px; }
-        .holding-row { background: var(--bg-card); border-radius: 12px; padding: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); }
-        .holding-row .val { font-weight: 700; font-size: 1.1rem; }
-        .holding-row .sub { font-size: 0.75rem; color: var(--text-muted); }
-        .holding-row.success { border-left: 3px solid var(--success); }
-        .holding-row.pending { border-left: 3px solid var(--warning); }
- 
-        /* WALLET */
-        .wallet-address-box { background: rgba(0,212,255,0.04); border: 1px solid rgba(0,212,255,0.2); border-radius: 14px; padding: 16px; margin-bottom: 20px; }
-        .wallet-address-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-        .wallet-address-label i { color: var(--primary); }
-        .wallet-address-value { font-family: 'Space Mono', monospace; font-size: 0.78rem; color: var(--primary); word-break: break-all; line-height: 1.5; }
-        .wallet-network-tag { display: inline-block; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); padding: 2px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 700; color: var(--primary); margin-top: 8px; }
- 
-        /* REFERRAL */
-        .referral-box { background: linear-gradient(135deg, rgba(0,255,136,0.05), rgba(0,212,255,0.05)); border: 1px solid rgba(0,255,136,0.2); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
-        .referral-code { font-family: 'Space Mono', monospace; font-size: 1.6rem; font-weight: 700; color: var(--accent); letter-spacing: 4px; text-align: center; padding: 15px; background: rgba(0,255,136,0.06); border-radius: 10px; margin: 12px 0; cursor: pointer; border: 1px dashed rgba(0,255,136,0.3); transition: 0.2s; }
-        .referral-code:hover { background: rgba(0,255,136,0.12); }
-        .referral-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
-        .ref-stat { background: rgba(255,255,255,0.03); border-radius: 10px; padding: 12px; text-align: center; }
-        .ref-stat-val { font-size: 1.2rem; font-weight: 700; color: var(--primary); }
-        .ref-stat-label { font-size: 0.65rem; color: var(--text-muted); margin-top: 3px; }
- 
-        /* ADMIN MESSAGES */
-        .admin-msg-box { background: rgba(255,71,87,0.05); border: 1px solid rgba(255,71,87,0.3); border-radius: 14px; padding: 15px; margin-bottom: 15px; }
-        .admin-msg-header { font-size: 0.65rem; color: var(--danger); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
-        .admin-msg-text { font-size: 0.88rem; color: #eee; }
- 
-        /* BOTTOM NAV */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(14,14,20,0.97); padding: 10px 0 6px; border-top: 1px solid var(--border); z-index: 99; display: flex; justify-content: space-around; }
-        .nav-btn { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); font-size: 0.62rem; cursor: pointer; transition: 0.2s; background: none; border: none; outline: none; padding: 0 4px; }
-        .nav-btn i { font-size: 1.2rem; margin-bottom: 3px; }
-        .nav-btn.active { color: var(--primary); }
- 
-        /* MODALS */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: center; padding: 20px; }
-        .modal-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; width: 100%; max-width: 400px; animation: popIn 0.3s; }
-        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .modal-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
-        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
-        .trade-tabs { display: flex; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 10px; margin-bottom: 20px; }
-        .trade-tab { flex: 1; padding: 10px; border: none; background: none; color: var(--text-muted); cursor: pointer; font-weight: 600; transition: 0.3s; border-radius: 8px; }
-        .trade-tab.active { background: var(--primary); color: #000; }
-        .balance-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; color: var(--text-muted); }
-        .balance-row span strong { color: white; }
-        .action-btn-group { display: flex; gap: 10px; margin-top: 20px; }
-        .btn-half { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); color: white; font-weight: 600; cursor: pointer; transition: 0.2s; }
-        .btn-half:hover { background: var(--primary); border-color: var(--primary); color: #000; }
- 
-        /* WITHDRAW */
-        .withdraw-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 15px; }
-        .withdraw-status { display: flex; justify-content: space-between; margin-bottom: 10px; }
-        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; }
-        .status-badge.approved { background: rgba(0,255,136,0.15); color: var(--accent); }
-        .status-badge.pending { background: rgba(255,212,59,0.15); color: var(--warning); }
-        .withdraw-amount { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
-        .withdraw-amounts { display: flex; gap: 10px; margin-bottom: 8px; }
-        .amount-btn { flex: 1; padding: 12px 8px; border-radius: 12px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text-muted); font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.3s; text-align: center; }
-        .amount-btn:hover { border-color: var(--primary); color: var(--primary); background: rgba(0,212,255,0.06); }
-        .amount-btn.selected { border-color: var(--accent); color: var(--accent); background: rgba(0,255,136,0.08); box-shadow: 0 0 12px rgba(0,255,136,0.2); }
-        .amount-label { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .fee-info-box { background: rgba(255,212,59,0.05); border: 1px solid rgba(255,212,59,0.2); border-radius: 10px; padding: 12px; margin-bottom: 14px; font-size: 0.78rem; }
-        .fee-info-box .fee-row { display: flex; justify-content: space-between; padding: 4px 0; }
-        .fee-info-box .fee-label { color: var(--text-muted); }
-        .fee-info-box .fee-value { color: var(--warning); font-weight: 700; }
-        .fee-info-box .fee-net { color: var(--accent); font-weight: 700; }
-        .locked-overlay { background: rgba(0,0,0,0.6); border: 1px dashed rgba(255,255,255,0.15); border-radius: 14px; padding: 30px; text-align: center; color: var(--text-muted); margin-bottom: 20px; }
-        .locked-overlay i { font-size: 2rem; color: var(--warning); margin-bottom: 10px; }
-        .locked-overlay p { font-size: 0.85rem; margin-top: 6px; }
- 
-        /* ══════════════════ ADMIN PANEL ══════════════════ */
-        .admin-view { display: none; min-height: 100vh; background: var(--admin-bg); }
-        .admin-nav { background: rgba(20,10,5,0.95); border-bottom: 1px solid rgba(255,107,53,0.2); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .admin-nav-logo { font-weight: 800; font-size: 1.2rem; color: var(--admin-primary); letter-spacing: 2px; }
-        .admin-badge { background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); color: var(--admin-primary); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
-        .admin-main { max-width: 1000px; margin: 0 auto; padding: 20px; }
-        .admin-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
-        @media(max-width:600px){ .admin-stats { grid-template-columns: 1fr; } }
-        .admin-stat-card { background: rgba(255,107,53,0.05); border: 1px solid rgba(255,107,53,0.15); border-radius: 14px; padding: 16px; }
-        .admin-stat-val { font-size: 1.8rem; font-weight: 700; color: var(--admin-primary); }
-        .admin-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; margin-top: 3px; }
-        .admin-section-title { font-size: 1rem; font-weight: 700; color: var(--admin-primary); border-left: 3px solid var(--admin-primary); padding-left: 10px; margin-bottom: 14px; }
-        .admin-user-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,107,53,0.1); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
-        .admin-user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
-        .admin-user-name { font-size: 1rem; font-weight: 700; }
-        .admin-user-meta { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
-        .admin-user-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-        .admin-btn { padding: 7px 14px; border-radius: 8px; border: none; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
-        .admin-btn.orange { background: rgba(255,107,53,0.15); color: var(--admin-primary); border: 1px solid rgba(255,107,53,0.3); }
-        .admin-btn.orange:hover { background: var(--admin-primary); color: #000; }
-        .admin-btn.green { background: rgba(0,255,136,0.1); color: var(--accent); border: 1px solid rgba(0,255,136,0.3); }
-        .admin-btn.green:hover { background: var(--accent); color: #000; }
-        .admin-btn.red { background: rgba(255,71,87,0.1); color: var(--danger); border: 1px solid rgba(255,71,87,0.3); }
-        .admin-btn.red:hover { background: var(--danger); color: #fff; }
-        .admin-btn.blue { background: rgba(0,212,255,0.1); color: var(--primary); border: 1px solid rgba(0,212,255,0.3); }
-        .admin-btn.blue:hover { background: var(--primary); color: #000; }
-        .admin-info-row { display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.8rem; color: var(--text-muted); }
-        .admin-info-row span strong { color: #fff; }
- 
-        /* ADMIN MODAL */
-        .admin-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px; }
-        .admin-modal-box { background: #120c08; border: 1px solid rgba(255,107,53,0.3); border-radius: 18px; padding: 24px; width: 100%; max-width: 380px; animation: popIn 0.3s; }
-        .admin-modal-title { font-size: 1rem; font-weight: 700; color: var(--admin-primary); margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
-        .admin-input { width: 100%; padding: 12px 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,107,53,0.2); border-radius: 10px; color: white; font-size: 0.95rem; outline: none; margin-bottom: 12px; transition: 0.3s; }
-        .admin-input:focus { border-color: var(--admin-primary); }
-        .admin-select { width: 100%; padding: 12px 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,107,53,0.2); border-radius: 10px; color: white; font-size: 0.95rem; outline: none; margin-bottom: 12px; cursor: pointer; }
-        .admin-select option { background: #1a0f08; }
-        .btn-admin-action { width: 100%; padding: 12px; border-radius: 10px; border: none; background: var(--admin-primary); color: #000; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: 0.3s; }
-        .btn-admin-action:hover { opacity: 0.85; }
- 
-        /* ADMIN LOGIN */
-        .admin-login-view { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at top, rgba(255,107,53,0.1), transparent 60%), var(--admin-bg); padding: 20px; }
-        .admin-login-card { background: rgba(255,107,53,0.03); border: 1px solid rgba(255,107,53,0.2); border-radius: 20px; padding: 36px; width: 100%; max-width: 360px; }
-        .admin-brand { text-align: center; margin-bottom: 24px; }
-        .admin-brand h1 { font-size: 1.8rem; font-weight: 800; color: var(--admin-primary); letter-spacing: 3px; }
-        .admin-brand p { font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; letter-spacing: 1px; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,212,255,0.3); border-radius:3px; }
+
+        /* ── NOISE OVERLAY ── */
+        body::before {
+            content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            opacity:.4;
+        }
+
+        /* ── LOADER ── */
+        .loader-screen { position:fixed; inset:0; background:var(--bg-dark); z-index:9999; display:flex; flex-direction:column; justify-content:center; align-items:center; transition:opacity 0.6s ease; }
+        .loader-screen.hidden { opacity:0; pointer-events:none; }
+        .loader-ring { width:56px; height:56px; border:2px solid rgba(0,212,255,0.1); border-top-color:var(--primary); border-radius:50%; animation:spin 0.9s linear infinite; }
+        .loader-logo { font-family:'Syne',sans-serif; font-size:2.2rem; font-weight:800; background:var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-top:18px; letter-spacing:4px; }
+        .loader-sub { font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--text-muted); margin-top:8px; letter-spacing:3px; animation:pulse 1.5s ease infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        @keyframes pulse { 0%,100% { opacity:.4; } 50% { opacity:1; } }
+
+        /* ── TICKER BAR ── */
+        .ticker-bar { background:rgba(0,212,255,0.04); border-bottom:1px solid var(--border); padding:6px 0; overflow:hidden; white-space:nowrap; }
+        .ticker-inner { display:inline-flex; gap:32px; animation:ticker 28s linear infinite; }
+        .ticker-inner:hover { animation-play-state:paused; }
+        .ticker-item { display:inline-flex; align-items:center; gap:7px; font-family:'DM Mono',monospace; font-size:0.72rem; }
+        .ticker-sym { color:var(--primary); font-weight:500; }
+        .ticker-price { color:var(--text); }
+        .ticker-change.up { color:var(--accent); }
+        .ticker-change.down { color:var(--danger); }
+        @keyframes ticker { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+
+        /* ── TOAST ── */
+        .toast-container { position:fixed; top:20px; right:20px; z-index:10000; display:flex; flex-direction:column; gap:8px; }
+        .toast { background:var(--bg-card2); border:1px solid var(--border); border-left:3px solid var(--primary); padding:12px 16px; border-radius:12px; min-width:280px; display:flex; align-items:center; gap:10px; animation:slideIn 0.3s ease forwards; box-shadow:0 12px 32px rgba(0,0,0,0.6), var(--glow); font-size:0.85rem; }
+        .toast.success { border-left-color:var(--success); }
+        .toast.error { border-left-color:var(--danger); }
+        @keyframes slideIn { from { transform:translateX(110%); opacity:0; } to { transform:translateX(0); opacity:1; } }
+
+        /* ── AUTH ── */
+        .auth-view { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; background:radial-gradient(ellipse 60% 50% at 50% 0%, rgba(0,212,255,0.1) 0%, transparent 70%), var(--bg-dark); position:relative; z-index:1; }
+        .auth-card { background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:24px; padding:38px 34px; width:100%; max-width:390px; backdrop-filter:blur(20px); box-shadow:0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.03); position:relative; overflow:hidden; }
+        .auth-card::before { content:''; position:absolute; top:-80px; right:-60px; width:200px; height:200px; background:radial-gradient(circle, rgba(0,212,255,0.08), transparent 70%); pointer-events:none; }
+
+        .brand { text-align:center; margin-bottom:28px; }
+        .brand h1 { font-size:2.8rem; font-weight:800; background:var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:4px; cursor:default; user-select:none; }
+        .brand p { color:var(--text-muted); font-size:0.75rem; margin-top:4px; letter-spacing:1.5px; font-family:'DM Mono',monospace; }
+
+        .live-users-badge { display:flex; align-items:center; justify-content:center; gap:7px; background:rgba(0,255,136,0.06); border:1px solid rgba(0,255,136,0.15); border-radius:20px; padding:6px 14px; margin-bottom:22px; font-size:0.75rem; }
+        .live-dot { width:7px; height:7px; background:var(--accent); border-radius:50%; animation:blink 1.2s ease infinite; }
+        @keyframes blink { 0%,100%{opacity:1;box-shadow:0 0 6px var(--accent);} 50%{opacity:0.3;box-shadow:none;} }
+
+        .input-group { margin-bottom:15px; position:relative; }
+        .input-group label { display:block; font-size:0.72rem; color:var(--text-muted); margin-bottom:7px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
+        .input-icon { position:absolute; left:13px; top:40px; color:var(--text-muted); font-size:0.85rem; }
+        .auth-input { width:100%; padding:13px 13px 13px 38px; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:12px; color:white; font-size:0.95rem; outline:none; transition:0.25s; font-family:'DM Sans',sans-serif; }
+        .auth-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(0,212,255,0.08); background:rgba(0,212,255,0.03); }
+        .auth-input::placeholder { color:var(--text-muted); font-size:0.85rem; }
+
+        .btn-action { width:100%; padding:14px; border-radius:12px; border:none; background:var(--gradient); color:#000; font-weight:700; font-size:0.95rem; cursor:pointer; transition:0.25s; margin-top:8px; font-family:'Syne',sans-serif; letter-spacing:0.5px; position:relative; overflow:hidden; }
+        .btn-action::after { content:''; position:absolute; inset:0; background:linear-gradient(rgba(255,255,255,0.1),transparent); opacity:0; transition:0.2s; }
+        .btn-action:hover::after { opacity:1; }
+        .btn-action:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,212,255,0.35); }
+        .btn-action:active { transform:translateY(0); }
+        .btn-action:disabled { opacity:0.45; cursor:not-allowed; }
+
+        .auth-switch { text-align:center; margin-top:18px; font-size:0.83rem; color:var(--text-muted); }
+        .auth-switch a { color:var(--primary); text-decoration:none; font-weight:700; margin-left:4px; }
+
+        .auth-trust { display:flex; justify-content:center; gap:18px; margin-top:20px; padding-top:18px; border-top:1px solid var(--border); }
+        .trust-item { display:flex; align-items:center; gap:5px; font-size:0.68rem; color:var(--text-muted); }
+        .trust-item i { color:var(--accent); }
+
+        /* MEMBERSHIP BADGES */
+        .mem-tag { padding:3px 9px; border-radius:6px; font-size:0.63rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+        .mem-none { background:rgba(255,255,255,0.08); color:#aaa; }
+        .mem-basic { background:linear-gradient(135deg,#636e72,#2d3436); color:white; }
+        .mem-premium { background:linear-gradient(135deg,#ffd700,#b8860b); color:#000; }
+        .mem-vip { background:linear-gradient(135deg,#a855f7,#7c3aed); color:white; }
+        .mem-platinum { background:linear-gradient(135deg,#00d4ff,#0891b2); color:#000; }
+        .mem-elite { background:linear-gradient(135deg,#ff4757,#c0392b); color:white; }
+
+        /* ── APP ── */
+        .app-view { display:none; min-height:100vh; padding-bottom:115px; position:relative; z-index:1; }
+
+        .top-nav { background:rgba(4,4,10,0.92); backdrop-filter:blur(20px); padding:10px 18px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; border-bottom:1px solid var(--border); }
+        .nav-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1.25rem; background:var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:3px; }
+
+        .user-profile-display { display:flex; align-items:center; gap:10px; }
+        .user-avatar { width:34px; height:34px; border-radius:10px; background:var(--gradient); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.88rem; color:#000; font-family:'Syne',sans-serif; }
+
+        .main-area { max-width:900px; margin:0 auto; padding:16px; }
+        .panel-section { display:none; animation:fadeUp 0.3s ease; }
+        .panel-section.active { display:block; }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(12px);} to{opacity:1;transform:translateY(0);} }
+
+        .panel-header { margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; }
+        .panel-title { font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:700; border-left:3px solid var(--primary); padding-left:10px; }
+
+        /* ── HERO ── */
+        .hero-banner { background:linear-gradient(135deg, rgba(0,212,255,0.07), rgba(123,47,247,0.05), rgba(0,255,136,0.04)); border:1px solid rgba(0,212,255,0.12); border-radius:20px; padding:22px 20px; margin-bottom:18px; position:relative; overflow:hidden; }
+        .hero-banner::before { content:''; position:absolute; top:-40px; right:-40px; width:160px; height:160px; background:radial-gradient(circle, rgba(0,212,255,0.12), transparent 70%); }
+        .hero-banner::after { content:''; position:absolute; bottom:-30px; left:30%; width:120px; height:120px; background:radial-gradient(circle, rgba(0,255,136,0.08), transparent 70%); }
+        .hero-title { font-family:'Syne',sans-serif; font-size:1.5rem; font-weight:800; margin-bottom:4px; }
+        .hero-sub { color:var(--text-muted); font-size:0.85rem; }
+        .hero-sub strong { color:var(--accent); }
+        .hero-balance-row { display:flex; gap:18px; margin-top:14px; flex-wrap:wrap; }
+        .mini-bal { background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:12px; padding:10px 14px; flex:1; min-width:120px; }
+        .mini-bal-label { font-size:0.65rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+        .mini-bal-val { font-family:'DM Mono',monospace; font-size:1.05rem; font-weight:500; color:var(--primary); }
+
+        /* ── CYCLE PROGRESS ── */
+        .cycle-card { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:18px; margin-bottom:16px; }
+        .cycle-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+        .cycle-title { font-size:0.8rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
+        .cycle-pct { font-family:'DM Mono',monospace; font-size:1rem; font-weight:500; color:var(--accent); }
+        .progress-bar-bg { width:100%; height:6px; background:rgba(255,255,255,0.05); border-radius:3px; overflow:hidden; }
+        .progress-bar-fill { height:100%; background:var(--gradient); border-radius:3px; transition:width 0.8s ease; }
+        .cycle-info-row { display:flex; justify-content:space-between; margin-top:10px; font-size:0.75rem; color:var(--text-muted); }
+        .cycle-info-row span strong { color:var(--text); }
+
+        /* ── STATS ── */
+        .card-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:18px; }
+        @media(max-width:480px) { .card-grid { grid-template-columns:1fr; } }
+        .stat-card { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:18px; transition:0.25s; }
+        .stat-card:hover { transform:translateY(-2px); border-color:var(--border2); box-shadow:var(--glow); }
+        .stat-card i { font-size:1.3rem; color:var(--primary); margin-bottom:10px; }
+        .stat-value { font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:700; margin-bottom:3px; }
+        .stat-label { font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
+
+        /* ── EARNINGS TICKER ── */
+        .earnings-display { background:linear-gradient(135deg, rgba(0,255,136,0.06), rgba(0,212,255,0.03)); border:1px solid rgba(0,255,136,0.15); border-radius:14px; padding:14px 18px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+        .earnings-left { display:flex; align-items:center; gap:10px; }
+        .earnings-icon { width:36px; height:36px; border-radius:10px; background:rgba(0,255,136,0.1); display:flex; align-items:center; justify-content:center; color:var(--accent); }
+        .earnings-label { font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
+        .earnings-value { font-family:'DM Mono',monospace; font-size:1.15rem; font-weight:500; color:var(--accent); }
+        .daily-badge { background:rgba(0,255,136,0.1); border:1px solid rgba(0,255,136,0.2); border-radius:20px; padding:4px 12px; font-size:0.72rem; color:var(--accent); font-weight:600; }
+
+        /* ── CHART ── */
+        .chart-box { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:18px; margin-bottom:18px; }
+        .chart-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+        .chart-title { font-family:'Syne',sans-serif; font-size:0.95rem; font-weight:700; }
+        .live-pill { display:flex; align-items:center; gap:5px; background:rgba(0,255,136,0.08); border:1px solid rgba(0,255,136,0.2); border-radius:20px; padding:3px 10px; font-size:0.7rem; color:var(--accent); }
+        .live-dot-sm { width:5px; height:5px; background:var(--accent); border-radius:50%; animation:blink 1.2s ease infinite; }
+        .chart-tabs { display:flex; gap:6px; margin-bottom:14px; }
+        .chart-tab { padding:5px 12px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--text-muted); font-size:0.72rem; cursor:pointer; transition:0.2s; font-family:'DM Sans',sans-serif; }
+        .chart-tab.active { background:rgba(0,212,255,0.1); border-color:var(--primary); color:var(--primary); }
+
+        /* ── CRYPTO ── */
+        .crypto-list { display:flex; flex-direction:column; gap:8px; }
+        .crypto-item { background:var(--bg-card); border:1px solid var(--border); border-radius:13px; padding:13px 15px; display:flex; justify-content:space-between; align-items:center; transition:0.2s; cursor:pointer; }
+        .crypto-item:hover { background:var(--bg-card2); transform:translateX(4px); border-color:var(--border2); }
+        .crypto-left { display:flex; align-items:center; gap:11px; }
+        .crypto-icon { width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; font-weight:700; color:white; }
+        .crypto-info h4 { font-weight:600; font-size:0.9rem; }
+        .crypto-info p { font-size:0.7rem; color:var(--text-muted); font-family:'DM Mono',monospace; }
+        .crypto-right { text-align:right; }
+        .crypto-price { font-family:'DM Mono',monospace; font-weight:500; font-size:0.92rem; margin-bottom:3px; }
+        .price-tag { font-size:0.68rem; padding:2px 6px; border-radius:4px; font-family:'DM Mono',monospace; font-weight:500; }
+        .price-tag.up { background:rgba(0,255,136,0.1); color:var(--accent); }
+        .price-tag.down { background:rgba(255,71,87,0.1); color:var(--danger); }
+
+        /* ── NEWS FEED ── */
+        .news-section { margin-bottom:18px; }
+        .news-item { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:13px 15px; margin-bottom:8px; display:flex; gap:12px; align-items:flex-start; transition:0.2s; cursor:pointer; }
+        .news-item:hover { border-color:var(--border2); }
+        .news-dot { width:8px; height:8px; border-radius:50%; background:var(--primary); margin-top:5px; flex-shrink:0; }
+        .news-dot.accent { background:var(--accent); }
+        .news-dot.warn { background:var(--warning); }
+        .news-title { font-size:0.83rem; font-weight:600; margin-bottom:3px; line-height:1.4; }
+        .news-meta { font-size:0.68rem; color:var(--text-muted); }
+
+        /* ── MEMBERSHIPS ── */
+        .mem-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:22px; }
+        @media(max-width:950px) { .mem-grid { grid-template-columns:repeat(3,1fr); } }
+        @media(max-width:600px) { .mem-grid { grid-template-columns:repeat(2,1fr); } }
+        @media(max-width:360px) { .mem-grid { grid-template-columns:1fr; } }
+
+        .mem-card { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:16px 10px; text-align:center; transition:0.25s; cursor:pointer; position:relative; overflow:hidden; }
+        .mem-card:hover { transform:translateY(-5px); box-shadow:0 16px 40px rgba(0,0,0,0.5); }
+        .mem-card.selected { box-shadow:0 0 28px rgba(0,255,136,0.3); border-color:var(--accent) !important; }
+        .mem-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+        .mem-card.basic::before { background:linear-gradient(90deg,#636e72,#b2bec3); }
+        .mem-card.premium::before { background:linear-gradient(90deg,#ffd700,#f39c12); }
+        .mem-card.vip::before { background:linear-gradient(90deg,#a855f7,#7c3aed); }
+        .mem-card.platinum::before { background:linear-gradient(90deg,#00d4ff,#0891b2); }
+        .mem-card.elite::before { background:linear-gradient(90deg,#ff4757,#c0392b); }
+        .mem-name { font-family:'Syne',sans-serif; font-size:0.78rem; font-weight:700; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; }
+        .mem-card.basic .mem-name { color:#b2bec3; }
+        .mem-card.premium .mem-name { color:#ffd700; }
+        .mem-card.vip .mem-name { color:#a855f7; }
+        .mem-card.platinum .mem-name { color:#00d4ff; }
+        .mem-card.elite .mem-name { color:#ff4757; }
+        .mem-price { font-family:'DM Mono',monospace; font-size:1.35rem; font-weight:500; margin:6px 0; }
+        .mem-daily { font-size:0.7rem; color:var(--accent); font-weight:600; margin-bottom:3px; }
+        .mem-roi { font-size:0.72rem; color:var(--success); font-weight:600; margin-bottom:3px; }
+        .mem-withdraw { font-size:0.65rem; color:var(--text-muted); }
+        .mem-bonus { font-size:0.68rem; color:var(--warning); font-weight:700; margin-top:6px; background:rgba(255,212,59,0.06); border-radius:6px; padding:3px 0; }
+        .mem-popular { position:absolute; top:14px; right:-18px; background:var(--warning); color:#000; font-size:0.58rem; font-weight:700; padding:2px 20px; transform:rotate(45deg); letter-spacing:0.5px; }
+
+        /* ── WALLET ── */
+        .wallet-address-box { background:rgba(0,212,255,0.03); border:1px solid rgba(0,212,255,0.15); border-radius:16px; padding:18px; margin-bottom:18px; }
+        .wallet-address-label { font-size:0.68rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+        .wallet-address-label i { color:var(--primary); }
+        .wallet-address-value { font-family:'DM Mono',monospace; font-size:0.76rem; color:var(--primary); word-break:break-all; line-height:1.6; margin-bottom:10px; background:rgba(0,212,255,0.04); border-radius:8px; padding:10px 12px; border:1px solid rgba(0,212,255,0.08); }
+        .wallet-copy-btn { display:flex; align-items:center; gap:7px; background:rgba(0,212,255,0.08); border:1px solid rgba(0,212,255,0.2); border-radius:8px; padding:8px 14px; cursor:pointer; font-size:0.78rem; color:var(--primary); font-weight:600; width:fit-content; transition:0.2s; border:none; font-family:'DM Sans',sans-serif; }
+        .wallet-copy-btn:hover { background:rgba(0,212,255,0.15); }
+        .wallet-copy-btn.copied { color:var(--accent); background:rgba(0,255,136,0.08); }
+        .wallet-network-tag { display:inline-block; background:rgba(0,212,255,0.08); border:1px solid rgba(0,212,255,0.2); padding:3px 10px; border-radius:6px; font-size:0.63rem; font-weight:700; color:var(--primary); margin-bottom:10px; font-family:'DM Mono',monospace; }
+
+        /* ── REFERRAL ── */
+        .referral-box { background:linear-gradient(135deg,rgba(0,255,136,0.04),rgba(0,212,255,0.03)); border:1px solid rgba(0,255,136,0.15); border-radius:16px; padding:18px; margin-bottom:18px; }
+        .referral-code { font-family:'DM Mono',monospace; font-size:1.5rem; font-weight:500; color:var(--accent); letter-spacing:5px; text-align:center; padding:14px; background:rgba(0,255,136,0.05); border-radius:10px; cursor:pointer; border:1px dashed rgba(0,255,136,0.25); transition:0.2s; margin:12px 0; }
+        .referral-code:hover { background:rgba(0,255,136,0.1); }
+        .referral-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px; }
+        .ref-stat { background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:10px; padding:12px; text-align:center; }
+        .ref-stat-val { font-family:'DM Mono',monospace; font-size:1.15rem; font-weight:500; color:var(--primary); }
+        .ref-stat-label { font-size:0.63rem; color:var(--text-muted); margin-top:3px; text-transform:uppercase; }
+
+        /* ── HOLDINGS ── */
+        .holdings-grid { display:flex; flex-direction:column; gap:8px; }
+        .holding-row { background:var(--bg-card); border-radius:12px; padding:14px; display:flex; justify-content:space-between; align-items:center; border:1px solid var(--border); }
+        .holding-row .val { font-family:'DM Mono',monospace; font-weight:500; font-size:1rem; }
+        .holding-row .sub { font-size:0.7rem; color:var(--text-muted); margin-top:2px; }
+        .holding-row.success { border-left:3px solid var(--success); }
+        .holding-row.pending { border-left:3px solid var(--warning); }
+
+        /* ── WITHDRAW ── */
+        .withdraw-card { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:20px; margin-bottom:14px; }
+        .withdraw-status { display:flex; justify-content:space-between; margin-bottom:12px; align-items:center; }
+        .status-badge { padding:4px 10px; border-radius:20px; font-size:0.68rem; font-weight:700; font-family:'DM Mono',monospace; }
+        .status-badge.approved { background:rgba(0,255,136,0.1); color:var(--accent); border:1px solid rgba(0,255,136,0.2); }
+        .status-badge.pending { background:rgba(255,212,59,0.1); color:var(--warning); border:1px solid rgba(255,212,59,0.2); }
+        .withdraw-amount { font-family:'DM Mono',monospace; font-size:1.6rem; font-weight:500; color:var(--accent); margin-bottom:4px; }
+        .amount-label { font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+        .withdraw-amounts { display:flex; gap:8px; margin-bottom:10px; }
+        .amount-btn { flex:1; padding:11px 6px; border-radius:10px; border:1px solid var(--border); background:rgba(255,255,255,0.02); color:var(--text-muted); font-weight:700; font-size:0.95rem; cursor:pointer; transition:0.25s; text-align:center; font-family:'DM Mono',monospace; }
+        .amount-btn:hover { border-color:var(--primary); color:var(--primary); }
+        .amount-btn.selected { border-color:var(--accent); color:var(--accent); background:rgba(0,255,136,0.06); box-shadow:0 0 14px rgba(0,255,136,0.15); }
+        .fee-info-box { background:rgba(255,212,59,0.04); border:1px solid rgba(255,212,59,0.15); border-radius:10px; padding:12px; margin-bottom:12px; font-size:0.78rem; }
+        .fee-row { display:flex; justify-content:space-between; padding:3px 0; }
+        .fee-label { color:var(--text-muted); }
+        .fee-value { color:var(--warning); font-weight:700; font-family:'DM Mono',monospace; }
+        .fee-net { color:var(--accent); font-weight:700; font-family:'DM Mono',monospace; }
+        .locked-overlay { background:rgba(0,0,0,0.4); border:1px dashed rgba(255,255,255,0.1); border-radius:14px; padding:28px; text-align:center; color:var(--text-muted); margin-bottom:18px; }
+        .locked-overlay i { font-size:1.8rem; color:var(--warning); margin-bottom:10px; }
+        .locked-overlay p { font-size:0.82rem; margin-top:5px; }
+
+        /* ── ADMIN MSG ── */
+        .admin-msg-box { background:rgba(255,71,87,0.04); border:1px solid rgba(255,71,87,0.2); border-radius:12px; padding:14px; margin-bottom:12px; }
+        .admin-msg-header { font-size:0.63rem; color:var(--danger); text-transform:uppercase; letter-spacing:1px; font-weight:700; margin-bottom:6px; display:flex; align-items:center; gap:5px; }
+        .admin-msg-text { font-size:0.86rem; color:#eee; line-height:1.5; }
+
+        /* ── BOTTOM NAV ── */
+        .bottom-nav { position:fixed; bottom:0; left:0; right:0; background:rgba(4,4,10,0.97); padding:8px 0 env(safe-area-inset-bottom,8px); border-top:1px solid var(--border); z-index:99; display:flex; justify-content:space-around; backdrop-filter:blur(20px); }
+        .nav-btn { display:flex; flex-direction:column; align-items:center; color:var(--text-muted); font-size:0.58rem; cursor:pointer; transition:0.2s; background:none; border:none; outline:none; padding:2px 6px; gap:4px; font-family:'DM Sans',sans-serif; font-weight:500; letter-spacing:0.3px; }
+        .nav-btn i { font-size:1.1rem; transition:0.2s; }
+        .nav-btn.active { color:var(--primary); }
+        .nav-btn.active i { filter:drop-shadow(0 0 6px var(--primary)); }
+
+        /* ── MODALS ── */
+        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.88); backdrop-filter:blur(8px); z-index:1000; display:none; justify-content:center; align-items:flex-end; padding:0; }
+        @media(min-width:600px) { .modal-overlay { align-items:center; padding:20px; } }
+        .modal-box { background:var(--bg-card2); border:1px solid var(--border); border-radius:24px 24px 0 0; padding:24px; width:100%; max-width:420px; animation:slideUp 0.3s ease; }
+        @media(min-width:600px) { .modal-box { border-radius:20px; animation:popIn 0.3s ease; } }
+        @keyframes slideUp { from{transform:translateY(100%);opacity:0;} to{transform:translateY(0);opacity:1;} }
+        @keyframes popIn { from{transform:scale(0.93);opacity:0;} to{transform:scale(1);opacity:1;} }
+        .modal-handle { width:38px; height:4px; background:rgba(255,255,255,0.1); border-radius:2px; margin:0 auto 18px; }
+        @media(min-width:600px) { .modal-handle { display:none; } }
+        .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+        .modal-close { background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--text-muted); font-size:1.1rem; cursor:pointer; width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; transition:0.2s; }
+        .modal-close:hover { background:rgba(255,255,255,0.1); color:white; }
+        .trade-tabs { display:flex; background:rgba(255,255,255,0.03); padding:4px; border-radius:10px; margin-bottom:18px; gap:4px; }
+        .trade-tab { flex:1; padding:9px; border:none; background:none; color:var(--text-muted); cursor:pointer; font-weight:700; transition:0.25s; border-radius:8px; font-size:0.85rem; font-family:'Syne',sans-serif; }
+        .trade-tab.active { background:var(--primary); color:#000; }
+        .balance-row { display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.85rem; color:var(--text-muted); }
+        .balance-row span strong { color:white; font-family:'DM Mono',monospace; }
+        .action-btn-group { display:flex; gap:10px; margin-top:18px; }
+        .btn-half { flex:1; padding:12px; border-radius:10px; border:1px solid var(--border); background:rgba(255,255,255,0.03); color:white; font-weight:700; cursor:pointer; transition:0.2s; font-family:'DM Sans',sans-serif; }
+        .btn-half:hover { background:rgba(255,255,255,0.08); }
+
+        /* ── ADMIN PANEL ── */
+        .admin-view { display:none; min-height:100vh; background:var(--admin-bg); position:relative; z-index:1; }
+        .admin-nav { background:rgba(8,6,4,0.95); border-bottom:1px solid rgba(255,107,53,0.15); padding:12px 20px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; }
+        .admin-nav-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; color:var(--admin-primary); letter-spacing:2px; }
+        .admin-badge { background:rgba(255,107,53,0.1); border:1px solid rgba(255,107,53,0.2); color:var(--admin-primary); padding:4px 12px; border-radius:20px; font-size:0.7rem; font-weight:700; font-family:'DM Mono',monospace; }
+        .admin-main { max-width:1000px; margin:0 auto; padding:18px; }
+        .admin-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:22px; }
+        @media(max-width:600px) { .admin-stats { grid-template-columns:1fr; } }
+        .admin-stat-card { background:rgba(255,107,53,0.04); border:1px solid rgba(255,107,53,0.12); border-radius:14px; padding:16px; }
+        .admin-stat-val { font-family:'DM Mono',monospace; font-size:1.7rem; font-weight:500; color:var(--admin-primary); }
+        .admin-stat-label { font-size:0.68rem; color:var(--text-muted); text-transform:uppercase; margin-top:3px; letter-spacing:0.5px; }
+        .admin-section-title { font-family:'Syne',sans-serif; font-size:0.95rem; font-weight:700; color:var(--admin-primary); border-left:3px solid var(--admin-primary); padding-left:10px; margin-bottom:14px; }
+
+        /* Admin search */
+        .admin-search { width:100%; padding:10px 14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,107,53,0.15); border-radius:10px; color:white; font-size:0.88rem; outline:none; margin-bottom:16px; font-family:'DM Sans',sans-serif; }
+        .admin-search:focus { border-color:var(--admin-primary); }
+        .admin-search::placeholder { color:var(--text-muted); }
+
+        .admin-user-card { background:rgba(255,255,255,0.015); border:1px solid rgba(255,107,53,0.08); border-radius:14px; padding:16px; margin-bottom:10px; }
+        .admin-user-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px; }
+        .admin-user-name { font-family:'Syne',sans-serif; font-size:0.95rem; font-weight:700; }
+        .admin-user-meta { font-size:0.7rem; color:var(--text-muted); margin-top:2px; font-family:'DM Mono',monospace; }
+        .admin-user-actions { display:flex; gap:7px; flex-wrap:wrap; margin-top:10px; }
+        .admin-btn { padding:7px 12px; border-radius:8px; border:none; font-size:0.72rem; font-weight:700; cursor:pointer; transition:0.2s; font-family:'DM Sans',sans-serif; }
+        .admin-btn.orange { background:rgba(255,107,53,0.1); color:var(--admin-primary); border:1px solid rgba(255,107,53,0.25); }
+        .admin-btn.orange:hover { background:var(--admin-primary); color:#000; }
+        .admin-btn.green { background:rgba(0,255,136,0.08); color:var(--accent); border:1px solid rgba(0,255,136,0.2); }
+        .admin-btn.green:hover { background:var(--accent); color:#000; }
+        .admin-btn.red { background:rgba(255,71,87,0.08); color:var(--danger); border:1px solid rgba(255,71,87,0.2); }
+        .admin-btn.red:hover { background:var(--danger); color:#fff; }
+        .admin-btn.blue { background:rgba(0,212,255,0.08); color:var(--primary); border:1px solid rgba(0,212,255,0.2); }
+        .admin-btn.blue:hover { background:var(--primary); color:#000; }
+        .admin-info-row { display:flex; gap:16px; flex-wrap:wrap; font-size:0.78rem; color:var(--text-muted); }
+        .admin-info-row span strong { color:#fff; font-family:'DM Mono',monospace; }
+
+        /* Admin modal */
+        .admin-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:2000; display:none; justify-content:center; align-items:center; padding:20px; }
+        .admin-modal-box { background:#100a06; border:1px solid rgba(255,107,53,0.25); border-radius:18px; padding:24px; width:100%; max-width:380px; animation:popIn 0.3s ease; }
+        .admin-modal-title { font-family:'Syne',sans-serif; font-size:0.95rem; font-weight:700; color:var(--admin-primary); margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; }
+        .admin-input { width:100%; padding:11px 13px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,107,53,0.15); border-radius:10px; color:white; font-size:0.9rem; outline:none; margin-bottom:10px; transition:0.25s; font-family:'DM Sans',sans-serif; }
+        .admin-input:focus { border-color:var(--admin-primary); }
+        .admin-select { width:100%; padding:11px 13px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,107,53,0.15); border-radius:10px; color:white; font-size:0.9rem; outline:none; margin-bottom:10px; cursor:pointer; font-family:'DM Sans',sans-serif; }
+        .admin-select option { background:#1a0f08; }
+        .btn-admin-action { width:100%; padding:12px; border-radius:10px; border:none; background:var(--admin-primary); color:#000; font-weight:700; font-size:0.9rem; cursor:pointer; transition:0.2s; font-family:'Syne',sans-serif; }
+        .btn-admin-action:hover { opacity:0.85; }
+
+        /* Admin login */
+        .admin-login-view { min-height:100vh; display:flex; align-items:center; justify-content:center; background:radial-gradient(ellipse 50% 40% at 50% 0%, rgba(255,107,53,0.08), transparent 70%), var(--admin-bg); padding:20px; position:relative; z-index:1; }
+        .admin-login-card { background:rgba(255,107,53,0.02); border:1px solid rgba(255,107,53,0.15); border-radius:22px; padding:34px; width:100%; max-width:360px; }
+        .admin-brand { text-align:center; margin-bottom:24px; }
+        .admin-brand h1 { font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; color:var(--admin-primary); letter-spacing:3px; }
+        .admin-brand p { font-size:0.7rem; color:var(--text-muted); margin-top:5px; letter-spacing:1px; font-family:'DM Mono',monospace; }
+
+        /* PIN pad */
+        .pin-display { display:flex; justify-content:center; gap:10px; margin:14px 0 18px; }
+        .pin-dot { width:12px; height:12px; border-radius:50%; border:2px solid rgba(255,107,53,0.4); transition:0.2s; }
+        .pin-dot.filled { background:var(--admin-primary); border-color:var(--admin-primary); }
+        .pin-pad { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
+        .pin-key { padding:14px; border:1px solid rgba(255,107,53,0.15); background:rgba(255,107,53,0.04); border-radius:12px; color:white; font-family:'DM Mono',monospace; font-size:1.1rem; font-weight:500; cursor:pointer; transition:0.2s; text-align:center; }
+        .pin-key:hover { background:rgba(255,107,53,0.1); border-color:rgba(255,107,53,0.3); }
+        .pin-key:active { transform:scale(0.95); }
+        .pin-key.del { color:var(--danger); }
+        .pin-key.zero { grid-column:2; }
+
+        /* ─── IMPORTANT NOTICE ─── */
+        .sync-notice { background:rgba(255,212,59,0.06); border:1px solid rgba(255,212,59,0.2); border-radius:12px; padding:12px 16px; margin-bottom:16px; font-size:0.78rem; color:var(--warning); line-height:1.5; }
+        .sync-notice strong { display:block; margin-bottom:4px; }
+        .sync-actions { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+        .sync-btn { padding:6px 12px; border-radius:8px; border:1px solid rgba(255,212,59,0.3); background:rgba(255,212,59,0.08); color:var(--warning); font-size:0.72rem; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; transition:0.2s; }
+        .sync-btn:hover { background:rgba(255,212,59,0.15); }
+        .sync-btn.import { border-color:rgba(0,255,136,0.3); background:rgba(0,255,136,0.06); color:var(--accent); }
+        .sync-btn.import:hover { background:rgba(0,255,136,0.12); }
     </style>
 </head>
 <body>
- 
-    <div class="loader-screen" id="loader">
-        <div class="spinner"></div>
-        <p class="loader-text">CONECTANDO A RED FNL...</p>
-    </div>
- 
-    <div class="toast-container" id="toastContainer"></div>
- 
-    <!-- ═══════════════ ADMIN LOGIN ═══════════════ -->
-    <div class="admin-login-view" id="adminLoginSection" style="display:none;">
-        <div class="admin-login-card">
-            <div class="admin-brand">
-                <h1>⚙ ADMIN</h1>
-                <p>FNL Financial Network Latino — Panel de Control</p>
-            </div>
-            <div class="input-group">
-                <label style="color:rgba(255,107,53,0.7);">Usuario Admin</label>
-                <i class="fa-solid fa-shield input-icon" style="color:var(--admin-primary);"></i>
-                <input type="text" class="auth-input" id="adminUserIn" placeholder="admin" style="border-color:rgba(255,107,53,0.2);">
-            </div>
-            <div class="input-group">
-                <label style="color:rgba(255,107,53,0.7);">Contraseña</label>
-                <i class="fa-solid fa-lock input-icon" style="color:var(--admin-primary);"></i>
-                <input type="password" class="auth-input" id="adminPassIn" placeholder="••••••••" style="border-color:rgba(255,107,53,0.2);">
-            </div>
-            <button class="btn-action" style="background:var(--admin-primary);" onclick="handleAdminLogin()">ACCEDER AL PANEL</button>
-            <div style="text-align:center; margin-top:16px;">
-                <a href="#" onclick="goToUserLogin()" style="color:var(--text-muted);font-size:0.8rem;text-decoration:none;">← Volver al acceso de usuarios</a>
-            </div>
+
+<div class="loader-screen" id="loader">
+    <div class="loader-ring"></div>
+    <div class="loader-logo">FNL</div>
+    <div class="loader-sub">CONECTANDO A RED SEGURA...</div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ═══════════ ADMIN LOGIN ═══════════ -->
+<div class="admin-login-view" id="adminLoginSection" style="display:none;">
+    <div class="admin-login-card">
+        <div class="admin-brand">
+            <h1>⚙ ADMIN</h1>
+            <p>FNL Financial Network Latino — Control</p>
+        </div>
+        <div class="input-group">
+            <label style="color:rgba(255,107,53,0.6);">Usuario Administrador</label>
+            <i class="fa-solid fa-shield input-icon" style="color:var(--admin-primary);"></i>
+            <input type="text" class="auth-input" id="adminUserIn" placeholder="admin" style="border-color:rgba(255,107,53,0.2);">
+        </div>
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:10px;text-align:center;font-family:'DM Mono',monospace;">PIN de 6 dígitos</div>
+        <div class="pin-display" id="pinDisplay">
+            <div class="pin-dot" id="p0"></div><div class="pin-dot" id="p1"></div><div class="pin-dot" id="p2"></div>
+            <div class="pin-dot" id="p3"></div><div class="pin-dot" id="p4"></div><div class="pin-dot" id="p5"></div>
+        </div>
+        <div class="pin-pad" id="pinPad">
+            <div class="pin-key" onclick="pinPress('1')">1</div><div class="pin-key" onclick="pinPress('2')">2</div><div class="pin-key" onclick="pinPress('3')">3</div>
+            <div class="pin-key" onclick="pinPress('4')">4</div><div class="pin-key" onclick="pinPress('5')">5</div><div class="pin-key" onclick="pinPress('6')">6</div>
+            <div class="pin-key" onclick="pinPress('7')">7</div><div class="pin-key" onclick="pinPress('8')">8</div><div class="pin-key" onclick="pinPress('9')">9</div>
+            <div class="pin-key del" onclick="pinDel()"><i class="fa-solid fa-delete-left"></i></div>
+            <div class="pin-key zero" onclick="pinPress('0')">0</div>
+        </div>
+        <div style="text-align:center;margin-top:10px;">
+            <a href="#" onclick="goToUserLogin()" style="color:var(--text-muted);font-size:0.78rem;text-decoration:none;">← Volver al acceso de usuarios</a>
         </div>
     </div>
- 
-    <!-- ═══════════════ ADMIN PANEL ═══════════════ -->
-    <div class="admin-view" id="adminDashboard">
-        <nav class="admin-nav">
-            <div class="admin-nav-logo"><i class="fa-solid fa-shield-halved"></i> FNL ADMIN</div>
-            <div style="display:flex;align-items:center;gap:10px;">
-                <span class="admin-badge">ADMINISTRADOR</span>
-                <button onclick="adminLogout()" style="background:rgba(255,71,87,0.15);border:1px solid rgba(255,71,87,0.3);color:var(--danger);padding:6px 12px;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">
-                    <i class="fa-solid fa-right-from-bracket"></i> Salir
+</div>
+
+<!-- ═══════════ ADMIN PANEL ═══════════ -->
+<div class="admin-view" id="adminDashboard">
+    <nav class="admin-nav">
+        <div class="admin-nav-logo"><i class="fa-solid fa-shield-halved"></i> FNL ADMIN</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+            <span class="admin-badge">ADMINISTRADOR</span>
+            <button onclick="adminLogout()" style="background:rgba(255,71,87,0.1);border:1px solid rgba(255,71,87,0.2);color:var(--danger);padding:6px 12px;border-radius:8px;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">
+                <i class="fa-solid fa-right-from-bracket"></i> Salir
+            </button>
+        </div>
+    </nav>
+    <div class="admin-main">
+        <div class="sync-notice">
+            <strong><i class="fa-solid fa-triangle-exclamation"></i> Aviso importante sobre sincronización</strong>
+            Los datos se guardan localmente en este navegador. Para ver usuarios de otros dispositivos, usa <strong>Exportar DB</strong> desde ese dispositivo e <strong>Importar DB</strong> aquí.
+            <div class="sync-actions">
+                <button class="sync-btn" onclick="exportDB()"><i class="fa-solid fa-download"></i> Exportar DB</button>
+                <button class="sync-btn import" onclick="importDB()"><i class="fa-solid fa-upload"></i> Importar DB</button>
+                <button class="sync-btn" style="border-color:rgba(0,212,255,0.3);background:rgba(0,212,255,0.06);color:var(--primary);" onclick="renderAdminPanel()"><i class="fa-solid fa-rotate"></i> Actualizar</button>
+            </div>
+        </div>
+        <div class="admin-stats" id="adminStats"></div>
+        <div class="admin-section-title"><i class="fa-solid fa-users"></i> Usuarios Registrados</div>
+        <input class="admin-search" id="adminSearch" placeholder="🔍  Buscar por nombre de usuario..." oninput="filterAdminUsers()">
+        <div id="adminUserList"></div>
+    </div>
+</div>
+
+<!-- ═══════════ AUTH ═══════════ -->
+<div class="auth-view" id="authSection" style="display:none;">
+    <div class="auth-card">
+        <div class="brand">
+            <h1 id="fnlLogo" onclick="logoClickAdmin()" style="cursor:default;user-select:none;">FNL</h1>
+            <p>Financial Network Latino</p>
+        </div>
+
+        <div class="live-users-badge">
+            <div class="live-dot"></div>
+            <span style="color:var(--text-muted);font-size:0.73rem;"><strong id="liveUserCount" style="color:var(--accent);">1,247</strong> inversores activos ahora</span>
+        </div>
+
+        <div class="input-group" id="refCodeGroup" style="display:none;">
+            <label>Código de Invitación <span style="color:var(--accent);font-size:0.62rem;">(opcional)</span></label>
+            <i class="fa-solid fa-ticket input-icon"></i>
+            <input type="text" class="auth-input" id="refCodeIn" placeholder="FNL-XXXXXX" style="text-transform:uppercase;">
+        </div>
+        <div class="input-group">
+            <label>Usuario</label>
+            <i class="fa-solid fa-user input-icon"></i>
+            <input type="text" class="auth-input" id="userIn" placeholder="Tu alias">
+        </div>
+        <div class="input-group">
+            <label>Contraseña</label>
+            <i class="fa-solid fa-lock input-icon"></i>
+            <input type="password" class="auth-input" id="passIn" placeholder="••••••••">
+        </div>
+        <button class="btn-action" id="authBtn" onclick="handleAuth()">Entrar a FNL</button>
+        <div class="auth-switch">
+            <span id="switchHint">¿Nuevo?</span><a href="#" id="switchModeBtn" onclick="toggleAuthMode()"> Crear Cuenta</a>
+        </div>
+        <div class="auth-trust">
+            <div class="trust-item"><i class="fa-solid fa-shield-halved"></i> SSL 256-bit</div>
+            <div class="trust-item"><i class="fa-solid fa-lock"></i> Datos cifrados</div>
+            <div class="trust-item"><i class="fa-solid fa-globe"></i> Red global</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ APP ═══════════ -->
+<div class="app-view" id="dashboard">
+    <div class="ticker-bar">
+        <div class="ticker-inner" id="tickerInner">
+            <!-- populated by JS -->
+        </div>
+    </div>
+
+    <nav class="top-nav">
+        <div class="nav-logo">FNL</div>
+        <div class="user-profile-display">
+            <div class="mem-tag mem-none" id="memBadge">NINGUNA</div>
+            <div class="user-avatar" id="avatarInit">U</div>
+        </div>
+    </nav>
+
+    <div class="main-area">
+
+        <!-- HOME -->
+        <div id="panel-home" class="panel-section active">
+            <div class="hero-banner">
+                <div>
+                    <div class="hero-title">Hola, <span id="dispName">Usuario</span> 👋</div>
+                    <div class="hero-sub">Tu portfolio crece en tiempo real</div>
+                </div>
+                <div class="hero-balance-row">
+                    <div class="mini-bal">
+                        <div class="mini-bal-label">Liquidez</div>
+                        <div class="mini-bal-val" id="liqBalance">0.00</div>
+                    </div>
+                    <div class="mini-bal">
+                        <div class="mini-bal-label">Total</div>
+                        <div class="mini-bal-val" id="totalBalance">0.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin messages -->
+            <div id="adminMsgsContainer"></div>
+
+            <!-- Earnings display -->
+            <div class="earnings-display" id="earningsDisplay" style="display:none;">
+                <div class="earnings-left">
+                    <div class="earnings-icon"><i class="fa-solid fa-chart-line"></i></div>
+                    <div>
+                        <div class="earnings-label">Ganancias acumuladas</div>
+                        <div class="earnings-value" id="earningsValue">+$0.00</div>
+                    </div>
+                </div>
+                <div class="daily-badge" id="dailyBadge">+$0.00/día</div>
+            </div>
+
+            <!-- Cycle progress -->
+            <div class="cycle-card" id="cycleCard" style="display:none;">
+                <div class="cycle-header">
+                    <span class="cycle-title"><i class="fa-solid fa-rotate"></i> Progreso del ciclo</span>
+                    <span class="cycle-pct" id="cyclePct">0%</span>
+                </div>
+                <div class="progress-bar-bg"><div class="progress-bar-fill" id="cycleBar" style="width:0%"></div></div>
+                <div class="cycle-info-row">
+                    <span>Plan: <strong id="cycleMemName">—</strong></span>
+                    <span>Retiro en: <strong id="cycleTimer">--:--:--</strong></span>
+                </div>
+            </div>
+
+            <div class="card-grid">
+                <div class="stat-card">
+                    <i class="fa-solid fa-wallet"></i>
+                    <div class="stat-value" id="membership">NINGUNA</div>
+                    <div class="stat-label">Membresía Activa</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fa-solid fa-users"></i>
+                    <div class="stat-value" id="refCountHome">0</div>
+                    <div class="stat-label">Referidos</div>
+                </div>
+            </div>
+
+            <div class="chart-box">
+                <div class="chart-header">
+                    <span class="chart-title">Índice FNL</span>
+                    <span class="live-pill"><div class="live-dot-sm"></div> EN VIVO</span>
+                </div>
+                <div class="chart-tabs">
+                    <button class="chart-tab active" onclick="setChartTab(this,'1H')">1H</button>
+                    <button class="chart-tab" onclick="setChartTab(this,'1D')">1D</button>
+                    <button class="chart-tab" onclick="setChartTab(this,'1S')">1S</button>
+                </div>
+                <div style="height:160px;position:relative;">
+                    <canvas id="mainChart"></canvas>
+                </div>
+            </div>
+
+            <div class="panel-header">
+                <h3 class="panel-title">Mercados Cripto</h3>
+            </div>
+            <div class="crypto-list" id="cryptoListHome"></div>
+
+            <!-- News feed -->
+            <div class="panel-header" style="margin-top:22px;">
+                <h3 class="panel-title">Señales del Mercado</h3>
+            </div>
+            <div class="news-section" id="newsFeed"></div>
+        </div>
+
+        <!-- MEMBRESÍAS -->
+        <div id="panel-memberships" class="panel-section">
+            <div class="panel-header">
+                <h3 class="panel-title"><i class="fa-solid fa-crown" style="color:var(--warning);margin-right:8px;"></i> Membresías FNL</h3>
+            </div>
+            <div class="stat-card" style="margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+                <div>
+                    <div class="stat-label">Tu membresía actual</div>
+                    <div class="stat-value" id="membershipPanelActive" style="color:var(--primary);">NINGUNA</div>
+                </div>
+                <div style="text-align:right;">
+                    <div class="stat-label">Saldo disponible</div>
+                    <div class="stat-value" id="membershipPanelBalance" style="color:var(--accent);">0.00 USDT</div>
+                </div>
+            </div>
+            <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:18px;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.1);border-radius:12px;padding:13px;line-height:1.6;">
+                <i class="fa-solid fa-circle-info" style="color:var(--primary);margin-right:6px;"></i>
+                Activa tu plan, recibe un <strong style="color:var(--warning);">bono único</strong> al instante y genera ingresos diarios automáticos. Tu ciclo inicia al momento de la compra.
+            </div>
+            <div class="mem-grid">
+                <div id="mem-basic" class="mem-card basic" onclick="buyMembership('basic')">
+                    <div class="mem-name">Basic</div><div class="mem-price">$5</div>
+                    <div class="mem-daily">+$0.20/día</div><div class="mem-roi">$6 c/30 días</div>
+                    <div class="mem-withdraw">Retiro: $6</div><div class="mem-bonus">🎁 Bono: $0.35</div>
+                </div>
+                <div id="mem-premium" class="mem-card premium" onclick="buyMembership('premium')">
+                    <div class="mem-name">Premium</div><div class="mem-price">$10</div>
+                    <div class="mem-daily">+$0.40/día</div><div class="mem-roi">$12 c/30 días</div>
+                    <div class="mem-withdraw">Retiro: $12</div><div class="mem-bonus">🎁 Bono: $0.70</div>
+                </div>
+                <div id="mem-vip" class="mem-card vip" onclick="buyMembership('vip')" style="position:relative;overflow:hidden;">
+                    <div class="mem-popular">TOP</div>
+                    <div class="mem-name">VIP</div><div class="mem-price">$20</div>
+                    <div class="mem-daily">+$0.80/día</div><div class="mem-roi">$24 c/25 días</div>
+                    <div class="mem-withdraw">Retiro: $24</div><div class="mem-bonus">🎁 Bono: $1.40</div>
+                </div>
+                <div id="mem-platinum" class="mem-card platinum" onclick="buyMembership('platinum')">
+                    <div class="mem-name">Platinum</div><div class="mem-price">$50</div>
+                    <div class="mem-daily">+$1.83/día</div><div class="mem-roi">$55 c/25 días</div>
+                    <div class="mem-withdraw">Retiro: $55</div><div class="mem-bonus">🎁 Bono: $3.50</div>
+                </div>
+                <div id="mem-elite" class="mem-card elite" onclick="buyMembership('elite')">
+                    <div class="mem-name">Elite</div><div class="mem-price">$100</div>
+                    <div class="mem-daily">+$3.66/día</div><div class="mem-roi">$110 c/25 días</div>
+                    <div class="mem-withdraw">Retiro: $110</div><div class="mem-bonus">🎁 Bono: $7.00</div>
+                </div>
+            </div>
+
+            <!-- ROI Table -->
+            <div class="chart-box">
+                <div class="chart-header">
+                    <span class="chart-title">Proyección de Rendimiento</span>
+                    <span style="font-size:0.7rem;color:var(--text-muted);font-family:'DM Mono',monospace;">/ ciclo</span>
+                </div>
+                <div style="overflow-x:auto;">
+                <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
+                    <thead><tr style="color:var(--text-muted);text-align:left;">
+                        <th style="padding:8px 6px;border-bottom:1px solid var(--border);">Plan</th>
+                        <th style="padding:8px 6px;border-bottom:1px solid var(--border);">Inversión</th>
+                        <th style="padding:8px 6px;border-bottom:1px solid var(--border);">Diario</th>
+                        <th style="padding:8px 6px;border-bottom:1px solid var(--border);">Retiro</th>
+                        <th style="padding:8px 6px;border-bottom:1px solid var(--border);">ROI</th>
+                    </tr></thead>
+                    <tbody id="roiTableBody"></tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- RETIROS -->
+        <div id="panel-withdraw" class="panel-section">
+            <div class="panel-header"><h3 class="panel-title">Retiros</h3></div>
+            <div class="withdraw-card">
+                <div class="withdraw-status">
+                    <span style="color:var(--text-muted);font-size:0.82rem;">Estado:</span>
+                    <span class="status-badge pending" id="withdrawStatus">ESPERANDO MEMBRESÍA</span>
+                </div>
+                <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:10px;">
+                    <i class="fa-solid fa-clock"></i> Tiempo restante: <span id="withdrawTimer" style="font-family:'DM Mono',monospace;color:var(--text);">--:--:--</span>
+                </div>
+                <div class="withdraw-amount" id="withdrawAmount">0.00 USDT</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:16px;">Monto disponible según tu plan activo</div>
+                <div class="amount-label">Selecciona el monto a retirar</div>
+                <div class="withdraw-amounts">
+                    <div class="amount-btn" id="amtBtn5"  onclick="selectWithdrawAmount(5)">$5</div>
+                    <div class="amount-btn" id="amtBtn15" onclick="selectWithdrawAmount(15)">$15</div>
+                    <div class="amount-btn" id="amtBtn60" onclick="selectWithdrawAmount(60)">$60</div>
+                </div>
+                <div class="fee-info-box" id="feeInfoBox" style="display:none;">
+                    <div style="font-size:0.72rem;color:var(--warning);font-weight:700;margin-bottom:6px;"><i class="fa-solid fa-circle-exclamation"></i> Tasa de Red</div>
+                    <div class="fee-row"><span class="fee-label">Solicitado:</span><span class="fee-value" id="feeGross">$0.00</span></div>
+                    <div class="fee-row"><span class="fee-label">Comisión de red:</span><span class="fee-value" id="feeAmount">-$0.00</span></div>
+                    <div class="fee-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:4px;"><span class="fee-label">Recibirás:</span><span class="fee-net" id="feeNet">$0.00</span></div>
+                </div>
+                <div class="input-group">
+                    <label>Dirección de Wallet (BTC/USDT/TRX)</label>
+                    <i class="fa-solid fa-key input-icon" style="top:38px;"></i>
+                    <input type="text" class="auth-input" id="withdrawWallet" placeholder="Ej: TBx9... o bc1q..." style="padding-left:40px;">
+                </div>
+                <button class="btn-action" style="margin-top:4px;" onclick="requestWithdrawal()"><i class="fa-solid fa-paper-plane"></i> SOLICITAR RETIRO</button>
+            </div>
+            <div class="panel-header"><h3 class="panel-title">Historial de Retiros</h3></div>
+            <div class="holdings-grid" id="withdrawLog"></div>
+        </div>
+
+        <!-- WALLET -->
+        <div id="panel-portfolio" class="panel-section">
+            <div class="panel-header"><h3 class="panel-title">Mi Wallet</h3></div>
+            <div class="wallet-address-box">
+                <div class="wallet-address-label"><i class="fa-solid fa-arrow-right-to-bracket"></i> Dirección de depósito FNL</div>
+                <span class="wallet-network-tag">BEP20 (BSC)</span>
+                <div class="wallet-address-value" id="depositAddress">0x7d34506820fb566468cf41930fcaef81ca7a41a1</div>
+                <button class="wallet-copy-btn" onclick="copyWalletAddress()" id="copyWalletBtn">
+                    <i class="fa-regular fa-copy"></i> Copiar dirección
                 </button>
+                <div style="font-size:0.68rem;color:var(--text-muted);margin-top:10px;line-height:1.5;"><i class="fa-solid fa-triangle-exclamation" style="color:var(--warning);"></i> Envía únicamente <strong>USDT BEP20</strong>. Otra red puede causar pérdida permanente de fondos.</div>
             </div>
-        </nav>
- 
-        <div class="admin-main">
-            <div class="admin-stats" id="adminStats"></div>
- 
-            <div class="admin-section-title"><i class="fa-solid fa-users"></i> Usuarios Registrados</div>
-            <div id="adminUserList"></div>
-        </div>
-    </div>
- 
-    <!-- ═══════════════ AUTH ═══════════════ -->
-    <div class="auth-view" id="authSection" style="display:none;">
-        <div class="auth-card">
-            <div class="brand">
-                <!-- 5 clicks en logo → admin -->
-                <h1 id="fnlLogo" onclick="logoClickAdmin()">FNL</h1>
-                <p>Tu puerta a un financiamiento seguro</p>
+            <div class="stat-card" style="margin-bottom:18px;text-align:center;">
+                <div class="stat-label">PATRIMONIO TOTAL</div>
+                <div class="stat-value" style="font-size:1.9rem;color:var(--accent);font-family:'DM Mono',monospace;" id="patrimValue">0.00 USDT</div>
             </div>
- 
-            <!-- Campo de código de invitación (solo en registro) -->
-            <div class="input-group" id="refCodeGroup" style="display:none;">
-                <label>Código de Invitación <span style="color:var(--accent);font-size:0.65rem;">(opcional)</span></label>
-                <i class="fa-solid fa-ticket input-icon"></i>
-                <input type="text" class="auth-input" id="refCodeIn" placeholder="Ej: FNL-XXXX" style="text-transform:uppercase;">
+            <div class="holdings-grid" id="portfolioList"></div>
+            <div id="tradeButtonWrapper" style="display:none;">
+                <button class="btn-action" style="margin-top:18px;" onclick="openTradeModal()"><i class="fa-solid fa-arrow-right-arrow-left"></i> Operar Activos</button>
             </div>
- 
-            <div class="input-group">
-                <label>Usuario</label>
-                <i class="fa-solid fa-user input-icon"></i>
-                <input type="text" class="auth-input" id="userIn" placeholder="Tu alias">
-            </div>
-            <div class="input-group">
-                <label>Contraseña</label>
-                <i class="fa-solid fa-lock input-icon"></i>
-                <input type="password" class="auth-input" id="passIn" placeholder="••••••••">
-            </div>
-            <button class="btn-action" id="authBtn" onclick="handleAuth()">Entrar a FNL</button>
-            <div class="auth-switch">
-                <span id="switchHint">¿Nuevo?</span> <a href="#" id="switchModeBtn" onclick="toggleAuthMode()">Crear Cuenta</a>
+            <div id="tradeLockedMsg" class="locked-overlay" style="margin-top:18px;">
+                <i class="fa-solid fa-lock"></i>
+                <div style="font-weight:700;margin-top:8px;font-family:'Syne',sans-serif;">Operaciones bloqueadas</div>
+                <p>Adquiere una membresía para desbloquear operaciones con criptomonedas.</p>
             </div>
         </div>
-    </div>
- 
-    <!-- ═══════════════ APP ═══════════════ -->
-    <div class="app-view" id="dashboard">
-        <nav class="top-nav">
-            <div class="nav-logo"><i class="fa-solid fa-chart-line"></i> FNL</div>
-            <div class="user-profile-display">
-                <div class="mem-tag mem-none" id="memBadge">NINGUNA</div>
-                <div class="user-avatar" id="avatarInit">U</div>
+
+        <!-- PERFIL -->
+        <div id="panel-profile" class="panel-section">
+            <div class="panel-header"><h3 class="panel-title">Mi Perfil</h3></div>
+            <div class="stat-card" style="margin-bottom:18px;text-align:center;">
+                <div class="user-avatar" style="width:58px;height:58px;font-size:1.4rem;margin:0 auto 10px;" id="profileAvatar">U</div>
+                <div class="stat-value" id="profName">Usuario</div>
+                <div class="stat-label">Inversor FNL</div>
             </div>
-        </nav>
- 
-        <div class="main-area">
- 
-            <!-- HOME -->
-            <div id="panel-home" class="panel-section active">
-                <div class="hero-banner">
-                    <div>
-                        <div class="hero-title">Hola, <span id="dispName">Usuario</span></div>
-                        <div class="hero-sub">Balance total: <strong id="totalBalance">0.00 USDT</strong></div>
-                    </div>
-                </div>
- 
-                <!-- ADMIN MESSAGES for user -->
-                <div id="adminMsgsContainer"></div>
- 
-                <div class="card-grid">
-                    <div class="stat-card">
-                        <i class="fa-solid fa-wallet"></i>
-                        <div class="stat-value" id="liqBalance">0.00 USDT</div>
-                        <div class="stat-label">Liquidez USDT</div>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fa-solid fa-gem"></i>
-                        <div class="stat-value" id="membership">NINGUNA</div>
-                        <div class="stat-label">Membresía Activa</div>
-                    </div>
-                </div>
- 
-                <div class="chart-box">
-                    <div class="chart-header">
-                        <h3>Índice FNL (Mercado Real)</h3>
-                        <span class="live-indicator"><i class="fa-solid fa-circle"></i> EN VIVO</span>
-                    </div>
-                    <div style="height: 180px; position: relative; width: 100%;">
-                        <canvas id="mainChart"></canvas>
-                    </div>
-                </div>
- 
-                <div class="panel-header">
-                    <h3 class="panel-title">Mercados Cripto</h3>
-                </div>
-                <div class="crypto-list" id="cryptoListHome"></div>
+            <div class="card-grid">
+                <div class="stat-card"><div class="stat-label">Membresía</div><div class="stat-value" id="profileMem" style="font-size:1rem;color:var(--primary);">NINGUNA</div></div>
+                <div class="stat-card"><div class="stat-label">Bono recibido</div><div class="stat-value" id="profileBonusReceived" style="font-size:1rem;color:var(--accent);">$0.00</div></div>
             </div>
- 
-            <!-- MEMBRESÍAS -->
-            <div id="panel-memberships" class="panel-section">
-                <div class="panel-header">
-                    <h3 class="panel-title"><i class="fa-solid fa-crown" style="color: var(--primary); margin-right: 8px;"></i> Membresías FNL</h3>
-                </div>
-                <div class="stat-card" style="margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-                    <div>
-                        <div class="stat-label">Tu membresía actual</div>
-                        <div class="stat-value" id="membershipPanelActive" style="color: var(--primary);">NINGUNA</div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div class="stat-label">Saldo disponible</div>
-                        <div class="stat-value" id="membershipPanelBalance" style="color: var(--accent);">0.00 USDT</div>
-                    </div>
-                </div>
-                <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 18px; background: rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.1); border-radius: 12px; padding: 14px;">
-                    <i class="fa-solid fa-circle-info" style="color: var(--primary); margin-right: 6px;"></i>
-                    Elige tu plan, recibe un <strong style="color: var(--warning);">bono único</strong> al activarlo y genera ingresos estables según tu ciclo. El monto se descuenta de tu saldo líquido.
-                </div>
-                <div class="mem-grid">
-                    <div id="mem-basic" class="mem-card basic" onclick="buyMembership('basic')"><div class="mem-name">Basic</div><div class="mem-price">$5</div><div class="mem-daily">+$0.20/día</div><div class="mem-roi">$6 c/30 días</div><div class="mem-withdraw">Retiro: $6 c/30 días</div><div class="mem-bonus">🎁 Bono: $0.35</div></div>
-                    <div id="mem-premium" class="mem-card premium" onclick="buyMembership('premium')"><div class="mem-name">Premium</div><div class="mem-price">$10</div><div class="mem-daily">+$0.40/día</div><div class="mem-roi">$12 c/30 días</div><div class="mem-withdraw">Retiro: $12 c/30 días</div><div class="mem-bonus">🎁 Bono: $0.70</div></div>
-                    <div id="mem-vip" class="mem-card vip" onclick="buyMembership('vip')"><div class="mem-name">VIP</div><div class="mem-price">$20</div><div class="mem-daily">+$0.80/día</div><div class="mem-roi">$24 c/25 días</div><div class="mem-withdraw">Retiro: $24 c/25 días</div><div class="mem-bonus">🎁 Bono: $1.40</div></div>
-                    <div id="mem-platinum" class="mem-card platinum" onclick="buyMembership('platinum')"><div class="mem-name">Platinum</div><div class="mem-price">$50</div><div class="mem-daily">+$1.83/día</div><div class="mem-roi">$55 c/25 días</div><div class="mem-withdraw">Retiro: $55 c/25 días</div><div class="mem-bonus">🎁 Bono: $3.50</div></div>
-                    <div id="mem-elite" class="mem-card elite" onclick="buyMembership('elite')"><div class="mem-name">Elite</div><div class="mem-price">$100</div><div class="mem-daily">+$3.66/día</div><div class="mem-roi">$110 c/25 días</div><div class="mem-withdraw">Retiro: $110 c/25 días</div><div class="mem-bonus">🎁 Bono: $7.00</div></div>
+            <div class="referral-box">
+                <div style="font-size:0.78rem;font-weight:700;color:var(--accent);margin-bottom:4px;"><i class="fa-solid fa-user-plus"></i> Tu Código de Invitación</div>
+                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:2px;">Invita y gana <strong style="color:var(--warning);">$2.00 USDT</strong> por cada registro</div>
+                <div class="referral-code" id="myReferralCode" onclick="copyRefCode()">FNL-XXXX</div>
+                <div style="font-size:0.66rem;color:var(--text-muted);text-align:center;margin-top:-6px;margin-bottom:10px;"><i class="fa-regular fa-copy"></i> Toca para copiar</div>
+                <div class="referral-stats">
+                    <div class="ref-stat"><div class="ref-stat-val" id="refTotal">0</div><div class="ref-stat-label">Invitados</div></div>
+                    <div class="ref-stat"><div class="ref-stat-val" id="refEarned" style="color:var(--accent);">$0.00</div><div class="ref-stat-label">Ganado</div></div>
+                    <div class="ref-stat"><div class="ref-stat-val" id="refActive">0</div><div class="ref-stat-label">Con Plan</div></div>
                 </div>
             </div>
- 
-            <!-- RETIROS -->
-            <div id="panel-withdraw" class="panel-section">
-                <div class="panel-header"><h3 class="panel-title">Retiros</h3></div>
-                <div class="withdraw-card">
-                    <div class="withdraw-status">
-                        <span style="color:var(--text-muted)">Estado de retiro:</span>
-                        <span class="status-badge pending" id="withdrawStatus">ESPERANDO MEMBRESÍA</span>
-                    </div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">
-                        <i class="fa-solid fa-clock"></i> Tiempo restante del ciclo: <span id="withdrawTimer">--:--:--</span>
-                    </div>
-                    <div class="withdraw-amount" id="withdrawAmount">0.00 USDT</div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 18px;">Monto disponible según tu plan activo</div>
-                    <div class="amount-label">Selecciona el monto a retirar</div>
-                    <div class="withdraw-amounts">
-                        <div class="amount-btn" id="amtBtn5"  onclick="selectWithdrawAmount(5)">$5</div>
-                        <div class="amount-btn" id="amtBtn15" onclick="selectWithdrawAmount(15)">$15</div>
-                        <div class="amount-btn" id="amtBtn60" onclick="selectWithdrawAmount(60)">$60</div>
-                    </div>
-                    <div class="fee-info-box" id="feeInfoBox" style="display:none;">
-                        <div style="font-size: 0.75rem; color: var(--warning); font-weight: 700; margin-bottom: 6px;"><i class="fa-solid fa-circle-exclamation"></i> Tasa de Transacción</div>
-                        <div class="fee-row"><span class="fee-label">Monto solicitado:</span><span class="fee-value" id="feeGross">$0.00</span></div>
-                        <div class="fee-row"><span class="fee-label">Comisión de red:</span><span class="fee-value" id="feeAmount">-$0.00</span></div>
-                        <div class="fee-row" style="border-top: 1px solid rgba(255,255,255,0.05); margin-top: 4px; padding-top: 4px;"><span class="fee-label">Recibirás:</span><span class="fee-net" id="feeNet">$0.00 USDT</span></div>
-                    </div>
-                    <div class="input-group">
-                        <label>Dirección de Wallet (BTC/USDT/TRX)</label>
-                        <i class="fa-solid fa-key input-icon" style="top:38px;"></i>
-                        <input type="text" class="auth-input" id="withdrawWallet" placeholder="Ej: TBx9... o bc1q..." style="padding: 12px 12px 12px 42px;">
-                    </div>
-                    <button class="btn-action" style="margin-top:5px;" onclick="requestWithdrawal()">SOLICITAR RETIRO</button>
-                </div>
-                <div class="panel-header"><h3 class="panel-title">Historial de Retiros</h3></div>
-                <div class="holdings-grid" id="withdrawLog"></div>
-            </div>
- 
-            <!-- WALLET -->
-            <div id="panel-portfolio" class="panel-section">
-                <div class="panel-header"><h3 class="panel-title">Mi Wallet</h3></div>
-                <div class="wallet-address-box">
-                    <div class="wallet-address-label"><i class="fa-solid fa-arrow-right-to-bracket"></i> Dirección de depósito FNL</div>
-                    <div class="wallet-address-value">0x7d34506820fb566468cf41930fcaef81ca7a41a1</div>
-                    <div><span class="wallet-network-tag">BEP20 (BSC)</span></div>
-                    <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 8px;"><i class="fa-solid fa-triangle-exclamation" style="color: var(--warning);"></i> Envía únicamente USDT (BEP20) a esta dirección. Otra red puede causar pérdida de fondos.</div>
-                </div>
-                <div class="stat-card" style="margin-bottom: 20px; text-align: center;">
-                    <div class="stat-label">PATRIMONIO TOTAL</div>
-                    <div class="stat-value" style="font-size: 2rem; color: var(--accent);" id="patrimValue">0.00 USDT</div>
-                </div>
-                <div class="holdings-grid" id="portfolioList"></div>
-                <div id="tradeButtonWrapper" style="display:none;">
-                    <button class="btn-action" style="margin-top: 20px;" onclick="openTradeModal()"><i class="fa-solid fa-arrow-right-arrow-left"></i> Operar Activos</button>
-                </div>
-                <div id="tradeLockedMsg" class="locked-overlay" style="margin-top:20px;">
-                    <i class="fa-solid fa-lock"></i>
-                    <div style="font-weight: 700; margin-top: 8px;">Operaciones bloqueadas</div>
-                    <p>Adquiere una membresía para desbloquear las operaciones con criptomonedas.</p>
-                </div>
-            </div>
- 
-            <!-- MI PERFIL -->
-            <div id="panel-profile" class="panel-section">
-                <div class="panel-header"><h3 class="panel-title">Mi Perfil</h3></div>
-                <div class="stat-card" style="margin-bottom: 20px; text-align: center;">
-                    <div class="user-avatar" style="width: 60px; height: 60px; font-size: 1.5rem; margin: 0 auto 10px;" id="profileAvatar">U</div>
-                    <div class="stat-value" id="profName">Usuario</div>
-                    <div class="stat-label">Inversor FNL</div>
-                </div>
-                <div class="card-grid">
-                    <div class="stat-card"><div class="stat-label">Membresía</div><div class="stat-value" id="profileMem" style="font-size:1.1rem; color: var(--primary);">NINGUNA</div></div>
-                    <div class="stat-card"><div class="stat-label">Bono de membresía</div><div class="stat-value" id="profileBonusReceived" style="font-size:1.1rem; color: var(--accent);">$0.00</div></div>
-                </div>
- 
-                <!-- REFERIDOS -->
-                <div class="referral-box">
-                    <div style="font-size:0.8rem;font-weight:700;color:var(--accent);margin-bottom:4px;"><i class="fa-solid fa-user-plus"></i> Tu Código de Invitación</div>
-                    <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:4px;">Comparte tu código y gana <strong style="color:var(--warning);">$2.00 USDT</strong> por cada persona que se registre con él</div>
-                    <div class="referral-code" id="myReferralCode" onclick="copyRefCode()" title="Clic para copiar">FNL-XXXX</div>
-                    <div style="font-size:0.68rem;color:var(--text-muted);text-align:center;margin-top:-4px;margin-bottom:8px;"><i class="fa-regular fa-copy"></i> Toca para copiar</div>
-                    <div class="referral-stats">
-                        <div class="ref-stat"><div class="ref-stat-val" id="refTotal">0</div><div class="ref-stat-label">Invitados</div></div>
-                        <div class="ref-stat"><div class="ref-stat-val" id="refEarned" style="color:var(--accent);">$0.00</div><div class="ref-stat-label">Ganado</div></div>
-                        <div class="ref-stat"><div class="ref-stat-val" id="refActive">0</div><div class="ref-stat-label">Con Membresía</div></div>
-                    </div>
-                </div>
- 
-                <div class="panel-header" style="margin-top: 20px;"><h3 class="panel-title">Historial de Transacciones</h3></div>
-                <div class="holdings-grid" id="historyLog" style="max-height: 250px; overflow-y: auto;"></div>
-                <button class="btn-action" style="background: var(--danger); margin-top: 30px;" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</button>
-            </div>
- 
-        </div>
- 
-        <nav class="bottom-nav">
-            <button class="nav-btn active" onclick="switchPanel(this, 'home')"><i class="fa-solid fa-house"></i> Inicio</button>
-            <button class="nav-btn" onclick="switchPanel(this, 'memberships')"><i class="fa-solid fa-crown"></i> Membresías</button>
-            <button class="nav-btn" onclick="switchPanel(this, 'withdraw')"><i class="fa-solid fa-money-bill-transfer"></i> Retiros</button>
-            <button class="nav-btn" onclick="switchPanel(this, 'portfolio')"><i class="fa-solid fa-wallet"></i> Wallet</button>
-            <button class="nav-btn" onclick="switchPanel(this, 'profile')"><i class="fa-solid fa-user"></i> Mi Perfil</button>
-        </nav>
-    </div>
- 
-    <!-- TRADE MODAL -->
-    <div class="modal-overlay" id="tradeModal">
-        <div class="modal-box">
-            <div class="modal-header"><h3 id="tradeTitle">Operar</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
-            <div class="trade-tabs">
-                <button class="trade-tab active" id="tabBuy"  onclick="setMode('buy')">COMPRAR</button>
-                <button class="trade-tab"        id="tabSell" onclick="setMode('sell')">VENDER</button>
-            </div>
-            <div class="balance-row"><span>Tu Liquidez USDT:</span><span><strong id="tradeBal">0.00</strong></span></div>
-            <div class="input-group" style="margin-bottom: 12px;">
-                <label>Seleccionar Activo</label>
-                <select id="tradeAssetSelect" class="auth-input" style="padding: 12px; appearance: none; background-color: rgba(255,255,255,0.05); cursor: pointer;" onchange="updateTradeModalAsset()"></select>
-            </div>
-            <div class="balance-row"><span>Precio actual:</span><span><strong id="tradePrice">$0.00</strong></span></div>
-            <div class="input-group" style="margin-top: 15px;">
-                <label id="tradeInputLabel">Monto USDT</label>
-                <input type="number" class="auth-input" id="tradeInput" placeholder="0.00" oninput="calcConv()" style="padding-left: 15px;">
-            </div>
-            <div class="balance-row" style="background: rgba(255,255,255,0.02); padding: 10px; border-radius: 8px;">
-                <span id="labelResultType">Recibes:</span>
-                <span id="tradeOut" style="color: var(--primary); font-weight: bold;">0.00</span>
-            </div>
-            <div class="action-btn-group">
-                <button class="btn-half" style="background: var(--primary); border:none; color:#000;" onclick="execTrade()">CONFIRMAR</button>
-                <button class="btn-half" onclick="closeModal()">CANCELAR</button>
-            </div>
+            <div class="panel-header" style="margin-top:18px;"><h3 class="panel-title">Historial de Transacciones</h3></div>
+            <div class="holdings-grid" id="historyLog" style="max-height:280px;overflow-y:auto;"></div>
+            <button class="btn-action" style="background:rgba(255,71,87,0.15);color:var(--danger);border:1px solid rgba(255,71,87,0.3);margin-top:28px;" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</button>
         </div>
     </div>
- 
-    <!-- ADMIN MODAL (shared) -->
-    <div class="admin-modal-overlay" id="adminModal">
-        <div class="admin-modal-box">
-            <div class="admin-modal-title">
-                <span id="adminModalTitle">Acción</span>
-                <button onclick="closeAdminModal()" style="background:none;border:none;color:var(--text-muted);font-size:1.4rem;cursor:pointer;">&times;</button>
-            </div>
-            <div id="adminModalContent"></div>
+
+    <nav class="bottom-nav">
+        <button class="nav-btn active" onclick="switchPanel(this,'home')"><i class="fa-solid fa-house"></i>Inicio</button>
+        <button class="nav-btn" onclick="switchPanel(this,'memberships')"><i class="fa-solid fa-crown"></i>Planes</button>
+        <button class="nav-btn" onclick="switchPanel(this,'withdraw')"><i class="fa-solid fa-money-bill-transfer"></i>Retiros</button>
+        <button class="nav-btn" onclick="switchPanel(this,'portfolio')"><i class="fa-solid fa-wallet"></i>Wallet</button>
+        <button class="nav-btn" onclick="switchPanel(this,'profile')"><i class="fa-solid fa-user"></i>Perfil</button>
+    </nav>
+</div>
+
+<!-- TRADE MODAL -->
+<div class="modal-overlay" id="tradeModal">
+    <div class="modal-box">
+        <div class="modal-handle"></div>
+        <div class="modal-header">
+            <h3 id="tradeTitle" style="font-family:'Syne',sans-serif;">Operar</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="trade-tabs">
+            <button class="trade-tab active" id="tabBuy"  onclick="setMode('buy')">COMPRAR</button>
+            <button class="trade-tab"        id="tabSell" onclick="setMode('sell')">VENDER</button>
+        </div>
+        <div class="balance-row"><span>Tu Liquidez USDT:</span><span><strong id="tradeBal">0.00</strong></span></div>
+        <div class="input-group" style="margin-bottom:12px;">
+            <label>Activo</label>
+            <select id="tradeAssetSelect" class="auth-input" style="padding:12px;appearance:none;background:rgba(255,255,255,0.05);cursor:pointer;" onchange="updateTradeModalAsset()"></select>
+        </div>
+        <div class="balance-row"><span>Precio actual:</span><span><strong id="tradePrice" style="color:var(--primary);">$0.00</strong></span></div>
+        <div class="input-group" style="margin-top:14px;">
+            <label id="tradeInputLabel">Monto USDT</label>
+            <input type="number" class="auth-input" id="tradeInput" placeholder="0.00" oninput="calcConv()" style="padding-left:14px;">
+        </div>
+        <div class="balance-row" style="background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;">
+            <span id="labelResultType">Recibes:</span>
+            <span id="tradeOut" style="color:var(--primary);font-weight:bold;font-family:'DM Mono',monospace;">0.00</span>
+        </div>
+        <div class="action-btn-group">
+            <button class="btn-half" style="background:var(--primary);border:none;color:#000;" onclick="execTrade()">CONFIRMAR</button>
+            <button class="btn-half" onclick="closeModal()">CANCELAR</button>
         </div>
     </div>
- 
-    <script>
-    // ═══════════════════════════════════════════════════════
-    //  CONSTANTS & CONFIG
-    // ═══════════════════════════════════════════════════════
-    const DB_KEY       = 'fnl_users_db';
-    const ADMIN_USER   = 'fnladmin';
-    const ADMIN_PASS   = 'fnl2024admin';
-    const REF_BONUS    = 2.00;   // bono por referido
- 
-    const memberships = {
-        basic:    { name: 'Basic',    price: 5,   daily: 0.20, withdraw: 6,   days: 30, bonus: 0.35 },
-        premium:  { name: 'Premium',  price: 10,  daily: 0.40, withdraw: 12,  days: 30, bonus: 0.70 },
-        vip:      { name: 'VIP',      price: 20,  daily: 0.80, withdraw: 24,  days: 25, bonus: 1.40 },
-        platinum: { name: 'Platinum', price: 50,  daily: 1.83, withdraw: 55,  days: 25, bonus: 3.50 },
-        elite:    { name: 'Elite',    price: 100, daily: 3.66, withdraw: 110, days: 25, bonus: 7.00 }
-    };
-    const withdrawFees = { 5: 0.50, 15: 2.00, 60: 5.00 };
-    const withdrawNet  = { 5: 4.50, 15: 13.00, 60: 55.00 };
- 
-    let cryptoData = [
-        { id: 'btc', name: 'Bitcoin',  symbol: 'BTC', price: 67432.18, change: 0.8,  color: '#f7931a', icon: '₿' },
-        { id: 'eth', name: 'Ethereum', symbol: 'ETH', price: 3521.44,  change: -0.3, color: '#627eea', icon: 'Ξ' },
-        { id: 'sol', name: 'Solana',   symbol: 'SOL', price: 148.72,   change: 2.5,  color: '#14f195', icon: 'S' },
-        { id: 'bnb', name: 'BNB',      symbol: 'BNB', price: 605.30,   change: 1.2,  color: '#f3ba2f', icon: 'B' },
-        { id: 'xrp', name: 'XRP',      symbol: 'XRP', price: 0.5218,   change: -1.5, color: '#23292f', icon: 'X' }
-    ];
- 
-    let user = null;
-    let isRegister = false;
-    let activeCrypto = 'btc';
-    let tradeMode = 'buy';
-    let chartInstance = null;
-    let priceHistory = Array.from({length: 10}, () => Math.floor(Math.random() * (120 - 90) + 90));
-    let selectedWithdrawAmount = null;
-    let logoClickCount = 0;
-    let logoClickTimer = null;
- 
-    // ═══════════════════════════════════════════════════════
-    //  INIT
-    // ═══════════════════════════════════════════════════════
-    window.onload = () => {
-        setTimeout(() => {
-            document.getElementById('loader').classList.add('hidden');
-            const saved = localStorage.getItem('fnl_active_user');
-            if (saved === '__admin__') {
-                showAdminPanel();
-                return;
-            }
-            if (saved) {
-                const db = JSON.parse(localStorage.getItem(DB_KEY)) || {};
-                user = db[saved.toLowerCase()];
-                if (user) showDash();
-                else showAuthSection();
-            } else {
-                showAuthSection();
-            }
-        }, 1200);
-    };
- 
-    function showAuthSection() {
-        document.getElementById('authSection').style.display = 'flex';
-        document.getElementById('dashboard').style.display = 'none';
-        document.getElementById('adminDashboard').style.display = 'none';
-        document.getElementById('adminLoginSection').style.display = 'none';
-    }
- 
-    // ═══════════════════════════════════════════════════════
-    //  LOGO CLICK → ADMIN (5 taps rápidos)
-    // ═══════════════════════════════════════════════════════
-    function logoClickAdmin() {
-        logoClickCount++;
-        clearTimeout(logoClickTimer);
-        logoClickTimer = setTimeout(() => { logoClickCount = 0; }, 2000);
-        if (logoClickCount >= 5) {
-            logoClickCount = 0;
-            document.getElementById('authSection').style.display = 'none';
-            document.getElementById('adminLoginSection').style.display = 'flex';
+</div>
+
+<!-- ADMIN MODAL -->
+<div class="admin-modal-overlay" id="adminModal">
+    <div class="admin-modal-box">
+        <div class="admin-modal-title">
+            <span id="adminModalTitle">Acción</span>
+            <button onclick="closeAdminModal()" style="background:none;border:none;color:var(--text-muted);font-size:1.3rem;cursor:pointer;">&times;</button>
+        </div>
+        <div id="adminModalContent"></div>
+    </div>
+</div>
+
+<!-- Hidden file input for DB import -->
+<input type="file" id="dbFileInput" accept=".json" style="display:none;" onchange="handleImportDB(event)">
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  CONFIG & CONSTANTS
+// ═══════════════════════════════════════════════════════
+const DB_KEY     = 'fnl_users_db';
+const ADMIN_USER = 'fnladmin';
+const ADMIN_PIN  = '240689';   // <-- cambia este PIN (6 dígitos)
+const REF_BONUS  = 2.00;
+const WALLET_ADDR = '0x7d34506820fb566468cf41930fcaef81ca7a41a1';
+
+const memberships = {
+    basic:    { name:'Basic',    price:5,   daily:0.20, withdraw:6,   days:30, bonus:0.35 },
+    premium:  { name:'Premium',  price:10,  daily:0.40, withdraw:12,  days:30, bonus:0.70 },
+    vip:      { name:'VIP',      price:20,  daily:0.80, withdraw:24,  days:25, bonus:1.40 },
+    platinum: { name:'Platinum', price:50,  daily:1.83, withdraw:55,  days:25, bonus:3.50 },
+    elite:    { name:'Elite',    price:100, daily:3.66, withdraw:110, days:25, bonus:7.00 }
+};
+const withdrawFees = { 5:0.50, 15:2.00, 60:5.00 };
+const withdrawNet  = { 5:4.50, 15:13.00, 60:55.00 };
+
+let cryptoData = [
+    { id:'btc', name:'Bitcoin',  symbol:'BTC', price:67432.18, change:0.8,  color:'#f7931a', icon:'₿' },
+    { id:'eth', name:'Ethereum', symbol:'ETH', price:3521.44,  change:-0.3, color:'#627eea', icon:'Ξ' },
+    { id:'sol', name:'Solana',   symbol:'SOL', price:148.72,   change:2.5,  color:'#14f195', icon:'S' },
+    { id:'bnb', name:'BNB',      symbol:'BNB', price:605.30,   change:1.2,  color:'#f3ba2f', icon:'B' },
+    { id:'xrp', name:'XRP',      symbol:'XRP', price:0.5218,   change:-1.5, color:'#23292f', icon:'X' }
+];
+
+const newsItems = [
+    { text:'Bitcoin supera resistencia clave en $67K, analistas apuntan a $75K en el corto plazo', time:'hace 12 min', type:'accent' },
+    { text:'FNL registra volumen récord: +$2.4M en operaciones esta semana', time:'hace 28 min', type:'primary' },
+    { text:'Ethereum consolida soporte en $3,500 con fuerte demanda institucional', time:'hace 1h', type:'accent' },
+    { text:'Solana lidera ganancias del día con +2.5%, continúa expansión del ecosistema DeFi', time:'hace 2h', type:'primary' },
+    { text:'Alerta de volatilidad: XRP bajo presión antes de decisión regulatoria pendiente', time:'hace 3h', type:'warn' }
+];
+
+let user = null;
+let isRegister = false;
+let activeCrypto = 'btc';
+let tradeMode = 'buy';
+let chartInstance = null;
+let priceHistory = Array.from({length:20}, () => Math.floor(Math.random()*(120-90)+90));
+let selectedWithdrawAmount = null;
+let logoClickCount = 0;
+let logoClickTimer = null;
+let pinBuffer = '';
+let liveUsersBase = 1200 + Math.floor(Math.random()*200);
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+window.onload = () => {
+    // Animate live user count
+    animateLiveUsers();
+    setInterval(animateLiveUsers, 8000);
+
+    setTimeout(() => {
+        document.getElementById('loader').classList.add('hidden');
+        const saved = localStorage.getItem('fnl_active_user');
+        if (saved === '__admin__') { showAdminPanel(); return; }
+        if (saved) {
+            const db = getDB();
+            user = db[saved.toLowerCase()];
+            if (user) { showDash(); return; }
         }
-    }
- 
-    function goToUserLogin() {
-        document.getElementById('adminLoginSection').style.display = 'none';
         showAuthSection();
-    }
- 
-    // ═══════════════════════════════════════════════════════
-    //  HELPERS
-    // ═══════════════════════════════════════════════════════
-    function generateRefCode(username) {
-        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-        let code = 'FNL-';
-        for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
-        return code;
-    }
- 
-    function getDB() { return JSON.parse(localStorage.getItem(DB_KEY)) || {}; }
-    function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
-    function saveUserData() {
-        if (!user) return;
-        const db = getDB();
-        db[user.username.toLowerCase()] = user;
-        saveDB(db);
-    }
-    function formatUSDT(num) { return (num || 0).toFixed(2) + ' USDT'; }
-    function formatUSD(num)  { return '$' + (num || 0).toFixed(2); }
-    function calculateCryptoWealth() {
-        return cryptoData.reduce((acc, a) => acc + (user.holdings[a.id] || 0) * a.price, 0);
-    }
- 
-    // ═══════════════════════════════════════════════════════
-    //  AUTH
-    // ═══════════════════════════════════════════════════════
-    function toggleAuthMode() {
-        isRegister = !isRegister;
-        document.getElementById('authBtn').innerText = isRegister ? "CREAR CUENTA" : "ENTRAR A FNL";
-        document.getElementById('switchHint').innerText = isRegister ? "¿Ya tienes cuenta?" : "¿Nuevo?";
-        document.getElementById('switchModeBtn').innerText = isRegister ? "Iniciar Sesión" : "Crear Cuenta";
-        document.getElementById('refCodeGroup').style.display = isRegister ? 'block' : 'none';
-    }
- 
-    function handleAuth() {
-        const u = document.getElementById('userIn').value.trim();
-        const p = document.getElementById('passIn').value;
-        if (!u || !p) return showToast('error', 'Completa todos los campos');
-        const db = getDB();
- 
-        if (isRegister) {
-            if (db[u.toLowerCase()]) return showToast('error', 'El usuario ya existe');
- 
-            const refCode = document.getElementById('refCodeIn').value.trim().toUpperCase();
-            let referrerKey = null;
- 
-            // Validate referral code
-            if (refCode) {
-                referrerKey = Object.keys(db).find(k => db[k].refCode === refCode);
-                if (!referrerKey) return showToast('error', 'Código de invitación no válido.');
-            }
- 
-            user = {
-                username: u,
-                password: p,
-                balance: 0.00,
-                membership: null,
-                membershipBuyTime: null,
-                bonusReceived: 0,
-                holdings: { btc: 0, eth: 0, sol: 0, bnb: 0, xrp: 0 },
-                tx: [],
-                withdrawals: [],
-                joinDate: new Date().toLocaleDateString(),
-                refCode: generateRefCode(u),
-                referredBy: referrerKey || null,
-                referrals: [],
-                referralEarned: 0,
-                adminMessages: []
-            };
- 
-            db[u.toLowerCase()] = user;
- 
-            // Give bonus to referrer
-            if (referrerKey) {
-                db[referrerKey].referrals = db[referrerKey].referrals || [];
-                db[referrerKey].referrals.push(u.toLowerCase());
-                db[referrerKey].balance = (db[referrerKey].balance || 0) + REF_BONUS;
-                db[referrerKey].referralEarned = (db[referrerKey].referralEarned || 0) + REF_BONUS;
-                db[referrerKey].tx = db[referrerKey].tx || [];
-                db[referrerKey].tx.push({ desc: `🎟 Bono de referido: ${u}`, amount: REF_BONUS, type: 'bonus', date: new Date().toLocaleString() });
-            }
- 
-            saveDB(db);
-            showToast('success', '¡Cuenta creada! Inicia sesión para comenzar.');
-            isRegister = false;
-            toggleAuthMode();
-            document.getElementById('refCodeIn').value = '';
-        } else {
-            if (!db[u.toLowerCase()] || db[u.toLowerCase()].password !== p) return showToast('error', 'Credenciales incorrectas');
-            user = db[u.toLowerCase()];
-            // Migrate old users
-            if (!user.refCode) { user.refCode = generateRefCode(u); user.referrals = []; user.referralEarned = 0; user.adminMessages = []; saveUserData(); }
-            localStorage.setItem('fnl_active_user', u.toLowerCase());
-            showDash();
-        }
-    }
- 
-    // ═══════════════════════════════════════════════════════
-    //  DASHBOARD
-    // ═══════════════════════════════════════════════════════
-    function showDash() {
+    }, 1400);
+};
+
+function animateLiveUsers() {
+    const delta = Math.floor(Math.random()*15) - 5;
+    liveUsersBase = Math.max(1100, liveUsersBase + delta);
+    const el = document.getElementById('liveUserCount');
+    if (el) el.innerText = liveUsersBase.toLocaleString();
+}
+
+// ═══════════════════════════════════════════════════════
+//  VIEW SWITCHING
+// ═══════════════════════════════════════════════════════
+function showAuthSection() {
+    document.getElementById('authSection').style.display = 'flex';
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('adminDashboard').style.display = 'none';
+    document.getElementById('adminLoginSection').style.display = 'none';
+}
+function goToUserLogin() {
+    pinBuffer = ''; updatePinDots();
+    document.getElementById('adminLoginSection').style.display = 'none';
+    showAuthSection();
+}
+
+// ═══════════════════════════════════════════════════════
+//  LOGO → ADMIN (10 taps)
+// ═══════════════════════════════════════════════════════
+function logoClickAdmin() {
+    logoClickCount++;
+    clearTimeout(logoClickTimer);
+    logoClickTimer = setTimeout(() => { logoClickCount = 0; }, 3000);
+    if (logoClickCount >= 10) {
+        logoClickCount = 0;
         document.getElementById('authSection').style.display = 'none';
-        document.getElementById('adminLoginSection').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
-        document.getElementById('adminDashboard').style.display = 'none';
- 
-        document.getElementById('dispName').innerText = user.username;
-        document.getElementById('profName').innerText = user.username;
-        document.getElementById('avatarInit').innerText = user.username.charAt(0).toUpperCase();
-        document.getElementById('profileAvatar').innerText = user.username.charAt(0).toUpperCase();
-        document.getElementById('myReferralCode').innerText = user.refCode || 'FNL-????';
- 
-        const selectEl = document.getElementById('tradeAssetSelect');
-        selectEl.innerHTML = '';
-        cryptoData.forEach(asset => {
-            const opt = document.createElement('option');
-            opt.value = asset.id; opt.innerText = `${asset.name} (${asset.symbol})`;
-            selectEl.appendChild(opt);
-        });
-        activeCrypto = cryptoData[0].id;
- 
-        updateUI();
-        initChart();
-        startMarketLoop();
-        startWithdrawTimer();
+        document.getElementById('adminLoginSection').style.display = 'flex';
+        pinBuffer = ''; updatePinDots();
     }
- 
-    function switchPanel(btn, panelId) {
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.panel-section').forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById(`panel-${panelId}`).classList.add('active');
-        updateUI();
+}
+
+// ═══════════════════════════════════════════════════════
+//  PIN PAD
+// ═══════════════════════════════════════════════════════
+function pinPress(digit) {
+    if (pinBuffer.length >= 6) return;
+    pinBuffer += digit;
+    updatePinDots();
+    if (pinBuffer.length === 6) setTimeout(tryAdminLogin, 200);
+}
+function pinDel() {
+    pinBuffer = pinBuffer.slice(0, -1);
+    updatePinDots();
+}
+function updatePinDots() {
+    for (let i = 0; i < 6; i++) {
+        const dot = document.getElementById('p' + i);
+        if (dot) dot.className = 'pin-dot' + (i < pinBuffer.length ? ' filled' : '');
     }
- 
-    function updateUI() {
-        if (!user) return;
-        const cryptoWealth = calculateCryptoWealth();
-        const total = user.balance + cryptoWealth;
- 
-        document.getElementById('liqBalance').innerText = formatUSDT(user.balance);
-        document.getElementById('totalBalance').innerText = formatUSDT(total);
-        document.getElementById('patrimValue').innerText = formatUSDT(total);
-        document.getElementById('tradeBal').innerText = formatUSDT(user.balance);
-        if (document.getElementById('membershipPanelBalance'))
-            document.getElementById('membershipPanelBalance').innerText = formatUSDT(user.balance);
- 
-        const badge   = document.getElementById('memBadge');
-        const memText = document.getElementById('membership');
-        badge.className = "mem-tag";
-        document.querySelectorAll('.mem-card').forEach(c => c.classList.remove('selected'));
- 
-        if (user.membership) {
-            const plan = user.membership;
-            badge.innerText = plan.toUpperCase(); badge.classList.add(`mem-${plan}`);
-            memText.innerText = plan.toUpperCase();
-            const ac = document.getElementById(`mem-${plan}`);
-            if (ac) ac.classList.add('selected');
-            document.getElementById('profileMem').innerText = plan.toUpperCase();
-            if (document.getElementById('membershipPanelActive'))
-                document.getElementById('membershipPanelActive').innerText = plan.toUpperCase();
-        } else {
-            badge.innerText = "NINGUNA"; badge.classList.add('mem-none');
-            memText.innerText = "NINGUNA";
-            document.getElementById('profileMem').innerText = "NINGUNA";
-            if (document.getElementById('membershipPanelActive'))
-                document.getElementById('membershipPanelActive').innerText = "NINGUNA";
+}
+function tryAdminLogin() {
+    const u = document.getElementById('adminUserIn').value.trim();
+    if (u === ADMIN_USER && pinBuffer === ADMIN_PIN) {
+        localStorage.setItem('fnl_active_user', '__admin__');
+        showAdminPanel();
+    } else {
+        showToast('error', 'Credenciales incorrectas');
+        pinBuffer = ''; updatePinDots();
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════
+function generateRefCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = 'FNL-';
+    for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+    return code;
+}
+function getDB() { try { return JSON.parse(localStorage.getItem(DB_KEY)) || {}; } catch { return {}; } }
+function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+function saveUserData() {
+    if (!user) return;
+    const db = getDB();
+    db[user.username.toLowerCase()] = user;
+    saveDB(db);
+}
+function fmt(num) { return (num||0).toFixed(2); }
+function fmtUSDT(num) { return fmt(num) + ' USDT'; }
+function fmtUSD(num) { return '$' + fmt(num); }
+function calcCryptoWealth() {
+    return cryptoData.reduce((a,c) => a + (user.holdings[c.id]||0) * c.price, 0);
+}
+function elapsed() {
+    if (!user.membershipBuyTime) return 0;
+    return Date.now() - user.membershipBuyTime;
+}
+function cycleDays() {
+    return user.membership ? memberships[user.membership].days : 0;
+}
+function cycleMs() { return cycleDays() * 86400000; }
+function daysElapsed() { return elapsed() / 86400000; }
+
+// ═══════════════════════════════════════════════════════
+//  AUTH
+// ═══════════════════════════════════════════════════════
+function toggleAuthMode() {
+    isRegister = !isRegister;
+    document.getElementById('authBtn').innerText = isRegister ? 'CREAR CUENTA' : 'ENTRAR A FNL';
+    document.getElementById('switchHint').innerText = isRegister ? '¿Ya tienes cuenta?' : '¿Nuevo?';
+    document.getElementById('switchModeBtn').innerText = isRegister ? ' Iniciar Sesión' : ' Crear Cuenta';
+    document.getElementById('refCodeGroup').style.display = isRegister ? 'block' : 'none';
+    return false;
+}
+
+function handleAuth() {
+    const u = document.getElementById('userIn').value.trim();
+    const p = document.getElementById('passIn').value;
+    if (!u || !p) return showToast('error', 'Completa todos los campos');
+    const db = getDB();
+
+    if (isRegister) {
+        if (db[u.toLowerCase()]) return showToast('error', 'El usuario ya existe');
+        const refCode = document.getElementById('refCodeIn').value.trim().toUpperCase();
+        let referrerKey = null;
+        if (refCode) {
+            referrerKey = Object.keys(db).find(k => db[k].refCode === refCode);
+            if (!referrerKey) return showToast('error', 'Código de invitación no válido');
         }
- 
-        document.getElementById('profileBonusReceived').innerText = formatUSD(user.bonusReceived || 0);
- 
-        // Trade unlock
-        const hasMem = !!user.membership;
-        document.getElementById('tradeButtonWrapper').style.display = hasMem ? 'block' : 'none';
-        document.getElementById('tradeLockedMsg').style.display    = hasMem ? 'none'  : 'block';
- 
-        // Referral stats
-        const db = getDB();
-        const refs = user.referrals || [];
-        document.getElementById('refTotal').innerText = refs.length;
-        document.getElementById('refEarned').innerText = formatUSD(user.referralEarned || 0);
-        const activeRefs = refs.filter(r => db[r] && db[r].membership).length;
-        document.getElementById('refActive').innerText = activeRefs;
- 
-        // Admin messages
-        const msgContainer = document.getElementById('adminMsgsContainer');
-        msgContainer.innerHTML = '';
-        (user.adminMessages || []).slice(-3).forEach(m => {
+        user = {
+            username: u, password: p, balance: 0,
+            membership: null, membershipBuyTime: null,
+            bonusReceived: 0, holdings: { btc:0, eth:0, sol:0, bnb:0, xrp:0 },
+            tx: [], withdrawals: [], joinDate: new Date().toLocaleDateString(),
+            refCode: generateRefCode(), referredBy: referrerKey || null,
+            referrals: [], referralEarned: 0, adminMessages: []
+        };
+        db[u.toLowerCase()] = user;
+        if (referrerKey) {
+            db[referrerKey].referrals = db[referrerKey].referrals || [];
+            db[referrerKey].referrals.push(u.toLowerCase());
+            db[referrerKey].balance = (db[referrerKey].balance || 0) + REF_BONUS;
+            db[referrerKey].referralEarned = (db[referrerKey].referralEarned || 0) + REF_BONUS;
+            db[referrerKey].tx = db[referrerKey].tx || [];
+            db[referrerKey].tx.push({ desc:`🎟 Bono referido: ${u}`, amount:REF_BONUS, type:'bonus', date:new Date().toLocaleString() });
+        }
+        saveDB(db);
+        showToast('success', '¡Cuenta creada! Inicia sesión');
+        isRegister = false; toggleAuthMode();
+        document.getElementById('refCodeIn').value = '';
+    } else {
+        if (!db[u.toLowerCase()] || db[u.toLowerCase()].password !== p)
+            return showToast('error', 'Credenciales incorrectas');
+        user = db[u.toLowerCase()];
+        // migration
+        if (!user.refCode) { user.refCode = generateRefCode(); user.referrals = []; user.referralEarned = 0; user.adminMessages = []; saveUserData(); }
+        localStorage.setItem('fnl_active_user', u.toLowerCase());
+        showDash();
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════════════════
+function showDash() {
+    document.getElementById('authSection').style.display = 'none';
+    document.getElementById('adminLoginSection').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('adminDashboard').style.display = 'none';
+
+    document.getElementById('dispName').innerText = user.username;
+    document.getElementById('profName').innerText = user.username;
+    document.getElementById('avatarInit').innerText = user.username[0].toUpperCase();
+    document.getElementById('profileAvatar').innerText = user.username[0].toUpperCase();
+    document.getElementById('myReferralCode').innerText = user.refCode || 'FNL-????';
+
+    const sel = document.getElementById('tradeAssetSelect');
+    sel.innerHTML = '';
+    cryptoData.forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a.id; opt.innerText = `${a.name} (${a.symbol})`;
+        sel.appendChild(opt);
+    });
+    activeCrypto = cryptoData[0].id;
+
+    renderNews();
+    buildRoiTable();
+    updateUI();
+    initChart();
+    startMarketLoop();
+    startTimerLoop();
+    buildTicker();
+}
+
+function switchPanel(btn, id) {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel-section').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(`panel-${id}`).classList.add('active');
+    updateUI();
+}
+
+function renderNews() {
+    const feed = document.getElementById('newsFeed');
+    if (!feed) return;
+    feed.innerHTML = '';
+    newsItems.forEach(n => {
+        const el = document.createElement('div');
+        el.className = 'news-item';
+        el.innerHTML = `<div class="news-dot ${n.type}"></div><div><div class="news-title">${n.text}</div><div class="news-meta"><i class="fa-regular fa-clock"></i> ${n.time}</div></div>`;
+        feed.appendChild(el);
+    });
+}
+
+function buildRoiTable() {
+    const tbody = document.getElementById('roiTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    Object.entries(memberships).forEach(([key, m]) => {
+        const roi = ((m.withdraw - m.price) / m.price * 100).toFixed(0);
+        const tr = document.createElement('tr');
+        tr.style.cssText = 'border-bottom:1px solid rgba(255,255,255,0.04);';
+        tr.innerHTML = `
+            <td style="padding:8px 6px;"><span class="mem-tag mem-${key}">${m.name}</span></td>
+            <td style="padding:8px 6px;font-family:'DM Mono',monospace;">$${m.price}</td>
+            <td style="padding:8px 6px;font-family:'DM Mono',monospace;color:var(--accent);">+$${m.daily}</td>
+            <td style="padding:8px 6px;font-family:'DM Mono',monospace;color:var(--primary);">$${m.withdraw}</td>
+            <td style="padding:8px 6px;font-family:'DM Mono',monospace;color:var(--warning);">+${roi}%</td>`;
+        tbody.appendChild(tr);
+    });
+}
+
+// ═══════════════════════════════════════════════════════
+//  UI UPDATE
+// ═══════════════════════════════════════════════════════
+function updateUI() {
+    if (!user) return;
+    const cw = calcCryptoWealth();
+    const total = user.balance + cw;
+
+    document.getElementById('liqBalance').innerText = fmt(user.balance);
+    document.getElementById('totalBalance').innerText = fmt(total);
+    document.getElementById('patrimValue').innerText = fmtUSDT(total);
+    document.getElementById('tradeBal').innerText = fmtUSDT(user.balance);
+    if (document.getElementById('membershipPanelBalance'))
+        document.getElementById('membershipPanelBalance').innerText = fmtUSDT(user.balance);
+
+    const badge = document.getElementById('memBadge');
+    badge.className = 'mem-tag';
+    document.querySelectorAll('.mem-card').forEach(c => c.classList.remove('selected'));
+
+    if (user.membership) {
+        const p = user.membership;
+        const plan = memberships[p];
+        badge.innerText = p.toUpperCase(); badge.classList.add(`mem-${p}`);
+        ['membership','profileMem','membershipPanelActive'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerText = p.toUpperCase();
+        });
+        const ac = document.getElementById(`mem-${p}`);
+        if (ac) ac.classList.add('selected');
+
+        // Earnings display
+        const days = Math.min(daysElapsed(), plan.days);
+        const earned = days * plan.daily;
+        const earEl = document.getElementById('earningsDisplay');
+        if (earEl) {
+            earEl.style.display = 'flex';
+            document.getElementById('earningsValue').innerText = `+$${earned.toFixed(3)}`;
+            document.getElementById('dailyBadge').innerText = `+$${plan.daily}/día`;
+        }
+
+        // Cycle card
+        const pct = Math.min(100, (elapsed() / cycleMs()) * 100);
+        const cycCard = document.getElementById('cycleCard');
+        if (cycCard) {
+            cycCard.style.display = 'block';
+            document.getElementById('cyclePct').innerText = pct.toFixed(1) + '%';
+            document.getElementById('cycleBar').style.width = pct + '%';
+            document.getElementById('cycleMemName').innerText = plan.name;
+        }
+    } else {
+        badge.innerText = 'NINGUNA'; badge.classList.add('mem-none');
+        ['membership','profileMem','membershipPanelActive'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerText = 'NINGUNA';
+        });
+        const earEl = document.getElementById('earningsDisplay');
+        if (earEl) earEl.style.display = 'none';
+        const cc = document.getElementById('cycleCard');
+        if (cc) cc.style.display = 'none';
+    }
+
+    document.getElementById('profileBonusReceived').innerText = fmtUSD(user.bonusReceived || 0);
+
+    const hasMem = !!user.membership;
+    document.getElementById('tradeButtonWrapper').style.display = hasMem ? 'block' : 'none';
+    document.getElementById('tradeLockedMsg').style.display = hasMem ? 'none' : 'block';
+
+    // Referral stats
+    const db = getDB();
+    const refs = user.referrals || [];
+    document.getElementById('refTotal').innerText = refs.length;
+    document.getElementById('refEarned').innerText = fmtUSD(user.referralEarned || 0);
+    document.getElementById('refActive').innerText = refs.filter(r => db[r]?.membership).length;
+    if (document.getElementById('refCountHome'))
+        document.getElementById('refCountHome').innerText = refs.length;
+
+    // Admin messages
+    const mc = document.getElementById('adminMsgsContainer');
+    mc.innerHTML = '';
+    (user.adminMessages || []).slice(-3).forEach(m => {
+        const el = document.createElement('div');
+        el.className = 'admin-msg-box';
+        el.innerHTML = `<div class="admin-msg-header"><i class="fa-solid fa-bullhorn"></i> Mensaje Admin · ${m.date}</div><div class="admin-msg-text">${m.text}</div>`;
+        mc.appendChild(el);
+    });
+
+    // Crypto list
+    const listHome = document.getElementById('cryptoListHome');
+    listHome.innerHTML = '';
+    cryptoData.forEach(asset => {
+        const card = document.createElement('div');
+        card.className = 'crypto-item';
+        card.onclick = () => {
+            if (!user.membership) return showToast('error', 'Necesitas un plan para operar');
+            activeCrypto = asset.id; openTradeModal();
+        };
+        const up = asset.change >= 0;
+        card.innerHTML = `<div class="crypto-left"><div class="crypto-icon" style="background:${asset.color}">${asset.icon}</div><div class="crypto-info"><h4>${asset.name}</h4><p>${asset.symbol}</p></div></div><div class="crypto-right"><div class="crypto-price">${fmtUSD(asset.price)}</div><span class="price-tag ${up?'up':'down'}">${up?'+':''}${asset.change.toFixed(2)}%</span></div>`;
+        listHome.appendChild(card);
+    });
+
+    // Ticker
+    buildTicker();
+
+    // Portfolio
+    const portList = document.getElementById('portfolioList');
+    portList.innerHTML = '';
+    const liqRow = document.createElement('div');
+    liqRow.className = 'holding-row success';
+    liqRow.innerHTML = `<div><div style="font-weight:600;">Saldo Líquido USDT</div><div class="sub">Listo para operar</div></div><div class="val">${fmtUSDT(user.balance)}</div>`;
+    portList.appendChild(liqRow);
+    cryptoData.forEach(asset => {
+        const amt = user.holdings[asset.id] || 0;
+        if (amt > 0) {
+            const row = document.createElement('div');
+            row.className = 'holding-row';
+            row.innerHTML = `<div><div style="font-weight:600;">${asset.name} (${asset.symbol})</div><div class="sub">${amt.toFixed(6)} · $${fmtUSD(asset.price)}</div></div><div class="val" style="text-align:right;"><div>${fmtUSDT(amt*asset.price)}</div><div class="sub">${amt.toFixed(4)} ${asset.symbol}</div></div>`;
+            portList.appendChild(row);
+        }
+    });
+
+    // History
+    const histLog = document.getElementById('historyLog');
+    histLog.innerHTML = '';
+    if (!user.tx?.length) {
+        histLog.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.83rem;">Sin transacciones.</div>`;
+    } else {
+        user.tx.slice().reverse().forEach(t => {
             const el = document.createElement('div');
-            el.className = 'admin-msg-box';
-            el.innerHTML = `<div class="admin-msg-header"><i class="fa-solid fa-bullhorn"></i> Mensaje del Administrador · ${m.date}</div><div class="admin-msg-text">${m.text}</div>`;
-            msgContainer.appendChild(el);
+            el.className = 'holding-row';
+            const isIn = t.type === 'gain' || t.type === 'bonus';
+            el.innerHTML = `<div><div style="font-weight:600;font-size:0.88rem;">${t.desc}</div><div class="sub" style="font-size:0.68rem;">${t.date}</div></div><div class="val" style="color:${isIn?'var(--accent)':'inherit'};font-size:0.9rem;">${isIn?'+':'-'}${fmtUSD(t.amount)}</div>`;
+            histLog.appendChild(el);
         });
- 
-        // Crypto list
-        const listHome = document.getElementById('cryptoListHome');
-        listHome.innerHTML = '';
+    }
+
+    updateWithdrawSection();
+}
+
+// ═══════════════════════════════════════════════════════
+//  TICKER
+// ═══════════════════════════════════════════════════════
+function buildTicker() {
+    const inner = document.getElementById('tickerInner');
+    if (!inner) return;
+    const items = [...cryptoData, ...cryptoData]; // duplicate for seamless loop
+    inner.innerHTML = items.map(a => {
+        const up = a.change >= 0;
+        return `<div class="ticker-item"><span class="ticker-sym">${a.symbol}</span><span class="ticker-price">${fmtUSD(a.price)}</span><span class="ticker-change ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(a.change).toFixed(2)}%</span></div>`;
+    }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  WALLET COPY
+// ═══════════════════════════════════════════════════════
+function copyWalletAddress() {
+    const addr = document.getElementById('depositAddress').innerText;
+    const btn = document.getElementById('copyWalletBtn');
+    navigator.clipboard.writeText(addr).catch(() => {
+        // fallback
+        const ta = document.createElement('textarea');
+        ta.value = addr; document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy');
+        document.body.removeChild(ta);
+    });
+    btn.classList.add('copied');
+    btn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Copiado!';
+    setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = '<i class="fa-regular fa-copy"></i> Copiar dirección';
+    }, 2000);
+    showToast('success', 'Dirección copiada al portapapeles');
+}
+
+function copyRefCode() {
+    const code = user.refCode || '';
+    navigator.clipboard.writeText(code).catch(() => {});
+    showToast('success', `Código copiado: ${code}`);
+}
+
+// ═══════════════════════════════════════════════════════
+//  MEMBERSHIPS
+// ═══════════════════════════════════════════════════════
+function buyMembership(tier) {
+    const plan = memberships[tier];
+    if (!plan) return;
+    if (user.membership === tier) return showToast('info', `Ya tienes activa la membresía ${plan.name}`);
+    if (user.balance < plan.price) return showToast('error', `Saldo insuficiente. Necesitas $${plan.price} USDT`);
+    const ok = confirm(`¿Activar plan ${plan.name} por $${plan.price} USDT?\n\nRecibirás un bono único de $${plan.bonus} USDT al instante.`);
+    if (!ok) return;
+    user.balance -= plan.price;
+    user.balance += plan.bonus;
+    user.bonusReceived = (user.bonusReceived || 0) + plan.bonus;
+    user.membership = tier;
+    user.membershipBuyTime = Date.now();
+    user.tx.push({ desc:`Activación Plan ${plan.name}`, amount:plan.price, type:'spend', date:new Date().toLocaleString() });
+    user.tx.push({ desc:`🎁 Bono ${plan.name}`, amount:plan.bonus, type:'bonus', date:new Date().toLocaleString() });
+    saveUserData(); updateUI();
+    showToast('success', `Plan ${plan.name} activado · Bono de $${plan.bonus} recibido 🎉`);
+}
+
+// ═══════════════════════════════════════════════════════
+//  WITHDRAW
+// ═══════════════════════════════════════════════════════
+function selectWithdrawAmount(amount) {
+    selectedWithdrawAmount = amount;
+    document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById(`amtBtn${amount}`).classList.add('selected');
+    const fee = withdrawFees[amount], net = withdrawNet[amount];
+    document.getElementById('feeInfoBox').style.display = 'block';
+    document.getElementById('feeGross').innerText  = fmtUSD(amount);
+    document.getElementById('feeAmount').innerText = '-' + fmtUSD(fee);
+    document.getElementById('feeNet').innerText    = fmtUSD(net) + ' USDT';
+}
+
+function updateWithdrawSection() {
+    const statusBadge = document.getElementById('withdrawStatus');
+    const wAmountEl   = document.getElementById('withdrawAmount');
+    if (!user.membership) {
+        statusBadge.innerText = 'SIN PLAN ACTIVO'; statusBadge.className = 'status-badge pending';
+        wAmountEl.innerText = '0.00 USDT';
+        document.getElementById('withdrawLog').innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.83rem;">Sin retiros procesados.</div>`;
+        return;
+    }
+    const plan = memberships[user.membership];
+    const cycleComplete = elapsed() >= cycleMs();
+    statusBadge.innerText = cycleComplete ? 'DISPONIBLE' : 'EN CICLO';
+    statusBadge.className = 'status-badge ' + (cycleComplete ? 'approved' : 'pending');
+    wAmountEl.innerText = fmtUSDT(plan.withdraw);
+
+    const wlog = document.getElementById('withdrawLog');
+    wlog.innerHTML = '';
+    if (!user.withdrawals?.length) {
+        wlog.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.83rem;">Sin retiros procesados.</div>`;
+    } else {
+        user.withdrawals.forEach(w => {
+            const item = document.createElement('div');
+            item.className = 'holding-row success';
+            item.innerHTML = `<div><div style="font-weight:600;">Retiro Procesado</div><div class="sub">A: ${w.wallet.substring(0,8)}...${w.wallet.slice(-4)}</div><div class="sub" style="font-size:0.65rem;">${w.date}</div></div><div class="val" style="color:var(--accent);">${fmtUSD(w.net)} USDT</div>`;
+            wlog.appendChild(item);
+        });
+    }
+}
+
+function requestWithdrawal() {
+    if (!user.membership) return showToast('error', 'Debes activar un plan primero');
+    if (elapsed() < cycleMs()) return showToast('error', 'El ciclo aún no ha concluido');
+    if (!selectedWithdrawAmount) return showToast('error', 'Selecciona un monto');
+    const wallet = document.getElementById('withdrawWallet').value.trim();
+    if (!wallet || wallet.length < 10) return showToast('error', 'Dirección de wallet inválida');
+    const gross = selectedWithdrawAmount, fee = withdrawFees[gross], net = withdrawNet[gross];
+    user.withdrawals.push({ amount:gross, fee, net, wallet, date:new Date().toLocaleString() });
+    user.tx.push({ desc:`Retiro $${gross} (comisión $${fee})`, amount:gross, type:'spend', date:new Date().toLocaleString() });
+    user.membershipBuyTime = Date.now();
+    saveUserData(); updateUI();
+    selectedWithdrawAmount = null;
+    document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('feeInfoBox').style.display = 'none';
+    document.getElementById('withdrawWallet').value = '';
+    showToast('success', `Retiro de $${gross} solicitado · Recibirás $${net} USDT`);
+}
+
+// ═══════════════════════════════════════════════════════
+//  TRADING
+// ═══════════════════════════════════════════════════════
+function openTradeModal() {
+    if (!user.membership) return showToast('error', 'Necesitas un plan para operar');
+    document.getElementById('tradeModal').style.display = 'flex';
+    document.getElementById('tradeAssetSelect').value = activeCrypto;
+    updateTradeModalAsset();
+}
+function updateTradeModalAsset() {
+    activeCrypto = document.getElementById('tradeAssetSelect').value;
+    const asset = cryptoData.find(a => a.id === activeCrypto);
+    document.getElementById('tradeTitle').innerText = `Operar ${asset.name}`;
+    document.getElementById('tradePrice').innerText = fmtUSD(asset.price);
+    document.getElementById('tradeInput').value = '';
+    document.getElementById('tradeOut').innerText = '0.00';
+    setMode(tradeMode);
+}
+function closeModal() { document.getElementById('tradeModal').style.display = 'none'; }
+function setMode(mode) {
+    tradeMode = mode;
+    document.getElementById('tabBuy').className  = `trade-tab ${mode==='buy'?'active':''}`;
+    document.getElementById('tabSell').className = `trade-tab ${mode==='sell'?'active':''}`;
+    const asset = cryptoData.find(a => a.id === activeCrypto);
+    if (mode === 'buy') {
+        document.getElementById('tradeInputLabel').innerText = 'Monto USDT a invertir';
+        document.getElementById('labelResultType').innerText = 'Recibes:';
+        document.getElementById('tradeBal').innerText = fmtUSDT(user.balance);
+    } else {
+        document.getElementById('tradeInputLabel').innerText = `${asset.symbol} a vender`;
+        document.getElementById('labelResultType').innerText = 'Recibes (USDT):';
+        document.getElementById('tradeBal').innerText = `${user.holdings[activeCrypto]||0} ${asset.symbol}`;
+    }
+    calcConv();
+}
+function calcConv() {
+    const v = parseFloat(document.getElementById('tradeInput').value) || 0;
+    const asset = cryptoData.find(a => a.id === activeCrypto);
+    document.getElementById('tradeOut').innerText = tradeMode === 'buy'
+        ? `${(v/asset.price).toFixed(6)} ${asset.symbol}`
+        : fmtUSDT(v * asset.price);
+}
+function execTrade() {
+    const v = parseFloat(document.getElementById('tradeInput').value) || 0;
+    if (v <= 0) return showToast('error', 'Ingresa una cantidad válida');
+    const asset = cryptoData.find(a => a.id === activeCrypto);
+    if (tradeMode === 'buy') {
+        if (user.balance < v) return showToast('error', 'Saldo insuficiente');
+        const recv = v / asset.price;
+        user.balance -= v;
+        user.holdings[activeCrypto] = (user.holdings[activeCrypto]||0) + recv;
+        user.tx.push({ desc:`Compra ${recv.toFixed(6)} ${asset.symbol}`, amount:v, type:'spend', date:new Date().toLocaleString() });
+        showToast('success', `Compraste ${recv.toFixed(6)} ${asset.symbol}`);
+    } else {
+        const owned = user.holdings[activeCrypto]||0;
+        if (owned < v) return showToast('error', `No tienes suficiente ${asset.symbol}`);
+        const received = v * asset.price;
+        user.holdings[activeCrypto] = owned - v;
+        user.balance += received;
+        user.tx.push({ desc:`Venta ${v.toFixed(6)} ${asset.symbol}`, amount:received, type:'gain', date:new Date().toLocaleString() });
+        showToast('success', `Vendiste ${v.toFixed(6)} ${asset.symbol} por ${fmtUSDT(received)}`);
+    }
+    saveUserData(); closeModal(); updateUI();
+}
+
+// ═══════════════════════════════════════════════════════
+//  CHART
+// ═══════════════════════════════════════════════════════
+function setChartTab(btn, label) {
+    document.querySelectorAll('.chart-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    priceHistory = Array.from({length:20}, () => Math.floor(Math.random()*(130-80)+80));
+    if (chartInstance) { chartInstance.data.datasets[0].data = priceHistory; chartInstance.update(); }
+}
+function initChart() {
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 160);
+    gradient.addColorStop(0, 'rgba(0,212,255,0.12)');
+    gradient.addColorStop(1, 'rgba(0,212,255,0)');
+    chartInstance = new Chart(ctx, {
+        type:'line',
+        data: {
+            labels: Array.from({length:20},(_,i)=>`${i}`),
+            datasets: [{ label:'FNL', data:priceHistory, borderColor:'#00d4ff', backgroundColor:gradient, fill:true, tension:0.45, borderWidth:1.5, pointRadius:0, pointHoverRadius:4 }]
+        },
+        options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>`$${ctx.raw.toFixed(2)}`}}}, scales:{ x:{display:false}, y:{grid:{color:'rgba(255,255,255,0.03)'}, ticks:{color:'#5a5a72',font:{size:10},maxTicksLimit:4}} }, animation:{duration:400} }
+    });
+}
+
+// ═══════════════════════════════════════════════════════
+//  MARKET LOOP + TIMER LOOP
+// ═══════════════════════════════════════════════════════
+function startMarketLoop() {
+    setInterval(() => {
         cryptoData.forEach(asset => {
-            const card = document.createElement('div');
-            card.className = 'crypto-item';
-            card.onclick = () => { if (!user.membership) return showToast('error', 'Necesitas una membresía para operar.'); activeCrypto = asset.id; openTradeModal(); };
-            const changeClass = asset.change >= 0 ? 'up' : 'down';
-            const sign = asset.change >= 0 ? '+' : '';
-            card.innerHTML = `<div class="crypto-left"><div class="crypto-icon" style="background:${asset.color}">${asset.icon}</div><div class="crypto-info"><h4>${asset.name}</h4><p>${asset.symbol}</p></div></div><div class="crypto-right"><div class="crypto-price">${formatUSD(asset.price)}</div><span class="price-tag ${changeClass}">${sign}${asset.change.toFixed(2)}%</span></div>`;
-            listHome.appendChild(card);
+            const vol = asset.id==='xrp'||asset.id==='sol' ? 0.003 : 0.0015;
+            const c = (Math.random()*2-1) * vol;
+            asset.price = Math.max(0.01, asset.price*(1+c));
+            asset.change = c*100;
         });
- 
-        // Portfolio
-        const portList = document.getElementById('portfolioList');
-        portList.innerHTML = '';
-        const liqRow = document.createElement('div');
-        liqRow.className = 'holding-row success';
-        liqRow.innerHTML = `<div><div style="font-weight:600;">Saldo Líquido USDT</div><div class="sub">Listo para operar o comprar membresía</div></div><div class="val">${formatUSDT(user.balance)}</div>`;
-        portList.appendChild(liqRow);
-        cryptoData.forEach(asset => {
-            const amount = user.holdings[asset.id] || 0;
-            if (amount > 0) {
-                const row = document.createElement('div');
-                row.className = 'holding-row';
-                row.innerHTML = `<div><div style="font-weight:600;">${asset.name} (${asset.symbol})</div><div class="sub">Cant: ${amount.toFixed(6)} • Precio: ${formatUSD(asset.price)}</div></div><div class="val" style="text-align:right;"><div>${formatUSDT(amount * asset.price)}</div><div class="sub">${amount.toFixed(4)} ${asset.symbol}</div></div>`;
-                portList.appendChild(row);
-            }
-        });
- 
-        // History
-        const histLog = document.getElementById('historyLog');
-        histLog.innerHTML = '';
-        if (!user.tx || user.tx.length === 0) {
-            histLog.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.85rem;">No tienes transacciones registradas.</div>`;
-        } else {
-            user.tx.slice().reverse().forEach(t => {
-                const el = document.createElement('div');
-                el.className = 'holding-row';
-                el.innerHTML = `<div><div style="font-weight:600;font-size:0.9rem;">${t.desc}</div><div class="sub" style="font-size:0.7rem;">${t.date}</div></div><div class="val" style="color:${t.type === 'gain' || t.type === 'bonus' ? 'var(--accent)' : 'inherit'};font-size:0.95rem;">${t.type === 'spend' ? '-' : '+'}${formatUSD(t.amount)}</div>`;
-                histLog.appendChild(el);
-            });
+        const avg = cryptoData.reduce((a,c)=>a+c.price,0)/1000;
+        priceHistory.push(avg);
+        if (priceHistory.length > 20) priceHistory.shift();
+        if (chartInstance) { chartInstance.data.datasets[0].data = priceHistory; chartInstance.update('none'); }
+        if (document.getElementById('tradeModal').style.display==='flex') {
+            const a = cryptoData.find(a=>a.id===activeCrypto);
+            document.getElementById('tradePrice').innerText = fmtUSD(a.price);
+            calcConv();
         }
- 
-        updateWithdrawSection();
-    }
- 
-    function copyRefCode() {
-        const code = user.refCode || '';
-        navigator.clipboard.writeText(code).catch(() => {});
-        showToast('success', `Código copiado: ${code}`);
-    }
- 
-    // ═══════════════════════════════════════════════════════
-    //  MEMBERSHIPS
-    // ═══════════════════════════════════════════════════════
-    function buyMembership(tier) {
-        const plan = memberships[tier];
-        if (!plan) return;
-        if (user.membership === tier) return showToast('info', `Ya tienes activa la membresía ${plan.name}`);
-        if (user.balance < plan.price) return showToast('error', `Saldo insuficiente. Necesitas ${formatUSD(plan.price)} USDT.`);
-        const confirmBuy = confirm(`¿Activar membresía ${plan.name} por ${formatUSD(plan.price)} USDT?\nRecibirás un bono único de ${formatUSD(plan.bonus)} USDT.`);
-        if (!confirmBuy) return;
-        user.balance -= plan.price;
-        user.balance += plan.bonus;
-        user.bonusReceived = (user.bonusReceived || 0) + plan.bonus;
-        user.membership = tier;
-        user.membershipBuyTime = Date.now();
-        user.tx.push({ desc: `Compra Membresía ${plan.name}`, amount: plan.price, type: 'spend', date: new Date().toLocaleString() });
-        user.tx.push({ desc: `🎁 Bono Membresía ${plan.name}`, amount: plan.bonus, type: 'bonus', date: new Date().toLocaleString() });
-        saveUserData();
-        updateUI();
-        showToast('success', `¡Membresía ${plan.name} activada! Bono de ${formatUSD(plan.bonus)} USDT recibido.`);
-    }
- 
-    // ═══════════════════════════════════════════════════════
-    //  WITHDRAW
-    // ═══════════════════════════════════════════════════════
-    function selectWithdrawAmount(amount) {
-        selectedWithdrawAmount = amount;
-        document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
-        document.getElementById(`amtBtn${amount}`).classList.add('selected');
-        const fee = withdrawFees[amount], net = withdrawNet[amount];
-        document.getElementById('feeInfoBox').style.display = 'block';
-        document.getElementById('feeGross').innerText  = formatUSD(amount);
-        document.getElementById('feeAmount').innerText = '-' + formatUSD(fee);
-        document.getElementById('feeNet').innerText    = formatUSD(net) + ' USDT';
-    }
- 
-    function updateWithdrawSection() {
-        const statusBadge = document.getElementById('withdrawStatus');
-        const wAmountEl   = document.getElementById('withdrawAmount');
-        if (!user.membership) {
-            statusBadge.innerText = 'SIN PLAN ACTIVO'; statusBadge.className = 'status-badge pending';
-            wAmountEl.innerText = '0.00 USDT';
-            document.getElementById('withdrawLog').innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.85rem;">No tienes retiros procesados.</div>`;
-            return;
+        buildTicker();
+        updateCryptoPrices();
+    }, 5000);
+}
+
+function updateCryptoPrices() {
+    document.querySelectorAll('.crypto-item').forEach((el, i) => {
+        if (!cryptoData[i]) return;
+        const asset = cryptoData[i];
+        const prEl = el.querySelector('.crypto-price');
+        const chEl = el.querySelector('.price-tag');
+        if (prEl) prEl.innerText = fmtUSD(asset.price);
+        if (chEl) {
+            const up = asset.change >= 0;
+            chEl.className = `price-tag ${up?'up':'down'}`;
+            chEl.innerText = `${up?'+':''}${asset.change.toFixed(2)}%`;
         }
+    });
+}
+
+function startTimerLoop() {
+    setInterval(() => {
+        if (!user?.membership || !user.membershipBuyTime) return;
         const plan = memberships[user.membership];
-        const msPassed = Date.now() - (user.membershipBuyTime || Date.now());
-        const msCycle  = plan.days * 24 * 60 * 60 * 1000;
-        if (msPassed >= msCycle) { statusBadge.innerText = 'DISPONIBLE'; statusBadge.className = 'status-badge approved'; }
-        else                     { statusBadge.innerText = 'BLOQUEADO';  statusBadge.className = 'status-badge pending'; }
-        wAmountEl.innerText = formatUSDT(plan.withdraw);
-        const withdrawLog = document.getElementById('withdrawLog');
-        withdrawLog.innerHTML = '';
-        if (!user.withdrawals || user.withdrawals.length === 0) {
-            withdrawLog.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.85rem;">No tienes retiros procesados.</div>`;
+        const remaining = cycleMs() - elapsed();
+
+        // Timer in home cycle card
+        const timerEl = document.getElementById('cycleTimer');
+        const wTimerEl = document.getElementById('withdrawTimer');
+        if (remaining <= 0) {
+            if (timerEl) timerEl.innerText = '¡Ciclo completo!';
+            if (wTimerEl) wTimerEl.innerText = '¡Disponible para retirar!';
         } else {
-            user.withdrawals.forEach(w => {
-                const item = document.createElement('div');
-                item.className = 'holding-row success';
-                item.innerHTML = `<div><div style="font-weight:600;">Retiro Procesado</div><div class="sub">A: ${w.wallet.substring(0,6)}...${w.wallet.substring(w.wallet.length-4)}</div><div class="sub" style="font-size:0.65rem;">${w.date}</div></div><div class="val" style="color:var(--accent);">${formatUSD(w.net)} USDT</div>`;
-                withdrawLog.appendChild(item);
-            });
+            const d = Math.floor(remaining/86400000);
+            const h = Math.floor((remaining%86400000)/3600000);
+            const m = Math.floor((remaining%3600000)/60000);
+            const s = Math.floor((remaining%60000)/1000);
+            const str = `${d}d ${h}h ${m}m ${s}s`;
+            if (timerEl) timerEl.innerText = str;
+            if (wTimerEl) wTimerEl.innerText = str;
         }
+
+        // Progress bar
+        const pct = Math.min(100, (elapsed()/cycleMs())*100);
+        const bar = document.getElementById('cycleBar');
+        const pctEl = document.getElementById('cyclePct');
+        if (bar) bar.style.width = pct + '%';
+        if (pctEl) pctEl.innerText = pct.toFixed(1) + '%';
+
+        // Earnings
+        const days = Math.min(elapsed()/86400000, plan.days);
+        const earnVal = document.getElementById('earningsValue');
+        if (earnVal) earnVal.innerText = `+$${(days*plan.daily).toFixed(4)}`;
+    }, 1000);
+}
+
+// ═══════════════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════════════
+function showToast(type, text) {
+    const c = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    const icon = type==='success'?'fa-circle-check':type==='error'?'fa-triangle-exclamation':'fa-circle-info';
+    t.innerHTML = `<i class="fa-solid ${icon}" style="color:${type==='success'?'var(--accent)':type==='error'?'var(--danger)':'var(--primary)'}"></i><span>${text}</span>`;
+    c.appendChild(t);
+    setTimeout(() => { t.style.animation='slideIn 0.3s ease reverse forwards'; setTimeout(()=>t.remove(),300); }, 3000);
+}
+
+function logout() {
+    localStorage.removeItem('fnl_active_user');
+    user = null;
+    document.getElementById('dashboard').style.display = 'none';
+    if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+    showAuthSection();
+    showToast('info', 'Sesión cerrada');
+}
+
+// ═══════════════════════════════════════════════════════
+//  ████  ADMIN PANEL  ████
+// ═══════════════════════════════════════════════════════
+function showAdminPanel() {
+    document.getElementById('authSection').style.display = 'none';
+    document.getElementById('adminLoginSection').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('adminDashboard').style.display = 'block';
+    renderAdminPanel();
+}
+function adminLogout() {
+    localStorage.removeItem('fnl_active_user');
+    document.getElementById('adminDashboard').style.display = 'none';
+    showAuthSection();
+    showToast('info', 'Sesión admin cerrada');
+}
+
+let allUsersCache = [];
+
+function renderAdminPanel() {
+    const db = getDB();
+    allUsersCache = Object.values(db);
+    const total = allUsersCache.reduce((a,u) => a+(u.balance||0), 0);
+    const withMem = allUsersCache.filter(u=>u.membership).length;
+    document.getElementById('adminStats').innerHTML = `
+        <div class="admin-stat-card"><div class="admin-stat-val">${allUsersCache.length}</div><div class="admin-stat-label">Usuarios Totales</div></div>
+        <div class="admin-stat-card"><div class="admin-stat-val">${withMem}</div><div class="admin-stat-label">Con Plan Activo</div></div>
+        <div class="admin-stat-card"><div class="admin-stat-val">$${total.toFixed(2)}</div><div class="admin-stat-label">Saldo Total (USDT)</div></div>`;
+    renderUserCards(allUsersCache);
+}
+
+function filterAdminUsers() {
+    const q = document.getElementById('adminSearch').value.toLowerCase();
+    const filtered = allUsersCache.filter(u => u.username.toLowerCase().includes(q));
+    renderUserCards(filtered);
+}
+
+function renderUserCards(users) {
+    const listEl = document.getElementById('adminUserList');
+    listEl.innerHTML = '';
+    if (!users.length) {
+        listEl.innerHTML = '<div style="color:var(--text-muted);padding:20px;text-align:center;font-size:0.85rem;">No hay usuarios que coincidan.</div>';
+        return;
     }
- 
-    function startWithdrawTimer() {
-        setInterval(() => {
-            const timerEl = document.getElementById('withdrawTimer');
-            if (!user || !user.membership || !user.membershipBuyTime) { timerEl.innerText = '--:--:--'; return; }
-            const plan = memberships[user.membership];
-            const msCycle = plan.days * 24 * 60 * 60 * 1000;
-            const remaining = msCycle - (Date.now() - user.membershipBuyTime);
-            if (remaining <= 0) { timerEl.innerText = '¡Ciclo completado! Puedes retirar.'; return; }
-            const d = Math.floor(remaining / 86400000);
-            const h = Math.floor((remaining % 86400000) / 3600000);
-            const m = Math.floor((remaining % 3600000) / 60000);
-            const s = Math.floor((remaining % 60000) / 1000);
-            timerEl.innerText = `${d}d ${h}h ${m}m ${s}s`;
-        }, 1000);
-    }
- 
-    function requestWithdrawal() {
-        if (!user.membership) return showToast('error', 'Debes adquirir una membresía para habilitar retiros.');
-        const plan = memberships[user.membership];
-        const elapsed = Date.now() - user.membershipBuyTime;
-        if (elapsed < plan.days * 86400000) return showToast('error', 'El ciclo aún no ha concluido.');
-        if (!selectedWithdrawAmount) return showToast('error', 'Por favor selecciona un monto.');
-        const walletAddr = document.getElementById('withdrawWallet').value.trim();
-        if (!walletAddr || walletAddr.length < 10) return showToast('error', 'Dirección de Wallet no válida.');
-        const gross = selectedWithdrawAmount, fee = withdrawFees[gross], net = withdrawNet[gross];
-        user.withdrawals.push({ amount: gross, fee, net, wallet: walletAddr, date: new Date().toLocaleString() });
-        user.tx.push({ desc: `Retiro ${formatUSD(gross)} (comisión ${formatUSD(fee)})`, amount: gross, type: 'spend', date: new Date().toLocaleString() });
-        user.membershipBuyTime = Date.now();
-        saveUserData(); updateUI();
-        selectedWithdrawAmount = null;
-        document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
-        document.getElementById('feeInfoBox').style.display = 'none';
-        document.getElementById('withdrawWallet').value = '';
-        showToast('success', `Retiro de ${formatUSD(gross)} solicitado. Recibirás ${formatUSD(net)} USDT.`);
-    }
- 
-    // ═══════════════════════════════════════════════════════
-    //  TRADING
-    // ═══════════════════════════════════════════════════════
-    function openTradeModal() {
-        if (!user.membership) return showToast('error', 'Necesitas una membresía para operar.');
-        document.getElementById('tradeModal').style.display = 'flex';
-        document.getElementById('tradeAssetSelect').value = activeCrypto;
-        updateTradeModalAsset();
-    }
-    function updateTradeModalAsset() {
-        activeCrypto = document.getElementById('tradeAssetSelect').value;
-        const asset = cryptoData.find(a => a.id === activeCrypto);
-        document.getElementById('tradeTitle').innerText = `Operar ${asset.name}`;
-        document.getElementById('tradePrice').innerText = formatUSD(asset.price);
-        document.getElementById('tradeInput').value = '';
-        document.getElementById('tradeOut').innerText = '0.00';
-        setMode(tradeMode);
-    }
-    function closeModal() { document.getElementById('tradeModal').style.display = 'none'; }
-    function setMode(mode) {
-        tradeMode = mode;
-        document.getElementById('tabBuy').className  = `trade-tab ${mode==='buy'?'active':''}`;
-        document.getElementById('tabSell').className = `trade-tab ${mode==='sell'?'active':''}`;
-        const asset = cryptoData.find(a => a.id === activeCrypto);
-        if (mode === 'buy') {
-            document.getElementById('tradeInputLabel').innerText = 'Monto USDT a gastar';
-            document.getElementById('labelResultType').innerText = 'Recibes (Cripto):';
-            document.getElementById('tradeBal').innerText = formatUSDT(user.balance);
-        } else {
-            document.getElementById('tradeInputLabel').innerText = `Monto de ${asset.symbol} a vender`;
-            document.getElementById('labelResultType').innerText = 'Recibes (USDT):';
-            document.getElementById('tradeBal').innerText = `${user.holdings[activeCrypto]||0} ${asset.symbol}`;
-        }
-        calcConv();
-    }
-    function calcConv() {
-        const v = parseFloat(document.getElementById('tradeInput').value) || 0;
-        const asset = cryptoData.find(a => a.id === activeCrypto);
-        document.getElementById('tradeOut').innerText = tradeMode === 'buy' ? `${(v/asset.price).toFixed(6)} ${asset.symbol}` : formatUSDT(v * asset.price);
-    }
-    function execTrade() {
-        const v = parseFloat(document.getElementById('tradeInput').value) || 0;
-        if (v <= 0) return showToast('error', 'Ingresa una cantidad válida');
-        const asset = cryptoData.find(a => a.id === activeCrypto);
-        if (tradeMode === 'buy') {
-            if (user.balance < v) return showToast('error', 'Saldo USDT insuficiente');
-            const received = v / asset.price;
-            user.balance -= v;
-            user.holdings[activeCrypto] = (user.holdings[activeCrypto]||0) + received;
-            user.tx.push({ desc: `Comprado ${received.toFixed(6)} ${asset.symbol}`, amount: v, type: 'spend', date: new Date().toLocaleString() });
-            showToast('success', `Compraste ${received.toFixed(6)} ${asset.symbol}`);
-        } else {
-            const owned = user.holdings[activeCrypto]||0;
-            if (owned < v) return showToast('error', `No tienes suficiente ${asset.symbol}`);
-            const usdtReceived = v * asset.price;
-            user.holdings[activeCrypto] = owned - v;
-            user.balance += usdtReceived;
-            user.tx.push({ desc: `Vendido ${v.toFixed(6)} ${asset.symbol}`, amount: usdtReceived, type: 'gain', date: new Date().toLocaleString() });
-            showToast('success', `Vendiste ${v.toFixed(6)} ${asset.symbol} por ${formatUSDT(usdtReceived)}`);
-        }
-        saveUserData(); closeModal(); updateUI();
-    }
- 
-    // ═══════════════════════════════════════════════════════
-    //  CHART & MARKET
-    // ═══════════════════════════════════════════════════════
-    function initChart() {
-        const ctx = document.getElementById('mainChart').getContext('2d');
-        chartInstance = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: Array.from({length:10},(_,i)=>`T-${10-i}`),
-                datasets: [{ label:'FNL Index', data: priceHistory, borderColor:'#00d4ff', backgroundColor:'rgba(0,212,255,0.05)', fill:true, tension:0.4, borderWidth:2, pointRadius:2 }]
-            },
-            options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{display:false}, y:{grid:{color:'rgba(255,255,255,0.03)'}, ticks:{color:'#6b6b7a',font:{size:10}}} } }
+    users.forEach(u => {
+        const refs = (u.referrals||[]).length;
+        const card = document.createElement('div');
+        card.className = 'admin-user-card';
+        card.innerHTML = `
+            <div class="admin-user-header">
+                <div>
+                    <div class="admin-user-name">${u.username} <span style="font-size:0.68rem;color:var(--text-muted);">(${u.joinDate||'—'})</span></div>
+                    <div class="admin-user-meta">Código: <strong style="color:var(--accent);">${u.refCode||'—'}</strong> · Invitado por: <strong>${u.referredBy||'—'}</strong></div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:1.05rem;font-weight:700;color:var(--accent);font-family:'DM Mono',monospace;">$${(u.balance||0).toFixed(2)}</div>
+                    <div style="font-size:0.68rem;color:var(--text-muted);">Plan: <strong style="color:#fff;">${u.membership?u.membership.toUpperCase():'NINGUNO'}</strong></div>
+                </div>
+            </div>
+            <div class="admin-info-row">
+                <span><i class="fa-solid fa-user-plus" style="color:var(--primary);"></i> Referidos: <strong>${refs}</strong></span>
+                <span><i class="fa-solid fa-dollar-sign" style="color:var(--accent);"></i> x refs: <strong>$${(u.referralEarned||0).toFixed(2)}</strong></span>
+                <span><i class="fa-solid fa-money-bill" style="color:var(--warning);"></i> Retiros: <strong>${(u.withdrawals||[]).length}</strong></span>
+            </div>
+            <div class="admin-user-actions">
+                <button class="admin-btn orange" onclick="adminChangeMem('${u.username.toLowerCase()}')"><i class="fa-solid fa-crown"></i> Membresía</button>
+                <button class="admin-btn green"  onclick="adminSendBalance('${u.username.toLowerCase()}')"><i class="fa-solid fa-paper-plane"></i> Saldo</button>
+                <button class="admin-btn red"    onclick="adminSendMessage('${u.username.toLowerCase()}')"><i class="fa-solid fa-bullhorn"></i> Mensaje</button>
+                <button class="admin-btn blue"   onclick="adminViewReferrals('${u.username.toLowerCase()}')"><i class="fa-solid fa-users"></i> Referidos</button>
+            </div>`;
+        listEl.appendChild(card);
+    });
+}
+
+// ─── Admin modal helpers ───
+function openAdminModal(title, html) {
+    document.getElementById('adminModalTitle').innerText = title;
+    document.getElementById('adminModalContent').innerHTML = html;
+    document.getElementById('adminModal').style.display = 'flex';
+}
+function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
+
+function adminChangeMem(ukey) {
+    const db = getDB(); const u = db[ukey];
+    if (!u) return;
+    openAdminModal(`Cambiar Plan: ${u.username}`, `
+        <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px;">Plan actual: <strong style="color:#fff;">${u.membership?u.membership.toUpperCase():'NINGUNO'}</strong></div>
+        <select class="admin-select" id="adminMemSelect">
+            <option value="">— Sin plan —</option>
+            <option value="basic">Basic ($5)</option>
+            <option value="premium">Premium ($10)</option>
+            <option value="vip">VIP ($20)</option>
+            <option value="platinum">Platinum ($50)</option>
+            <option value="elite">Elite ($100)</option>
+        </select>
+        <button class="btn-admin-action" onclick="confirmChangeMem('${ukey}')">CONFIRMAR</button>`);
+    document.getElementById('adminMemSelect').value = u.membership || '';
+}
+function confirmChangeMem(ukey) {
+    const db = getDB(); const u = db[ukey];
+    if (!u) return;
+    u.membership = document.getElementById('adminMemSelect').value || null;
+    if (u.membership) u.membershipBuyTime = Date.now();
+    db[ukey] = u; saveDB(db);
+    closeAdminModal(); renderAdminPanel();
+    showToast('success', `Plan de ${u.username} actualizado`);
+}
+
+function adminSendBalance(ukey) {
+    const db = getDB(); const u = db[ukey];
+    if (!u) return;
+    openAdminModal(`Enviar Saldo a ${u.username}`, `
+        <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px;">Saldo actual: <strong style="color:var(--accent);font-family:'DM Mono',monospace;">$${(u.balance||0).toFixed(2)} USDT</strong></div>
+        <input type="number" class="admin-input" id="adminBalAmount" placeholder="Monto (ej: 10.00)" min="0.01" step="0.01">
+        <input type="text"   class="admin-input" id="adminBalDesc"   placeholder="Descripción (ej: Bono especial)">
+        <button class="btn-admin-action" onclick="confirmSendBalance('${ukey}')">ENVIAR SALDO</button>`);
+}
+function confirmSendBalance(ukey) {
+    const db = getDB(); const u = db[ukey];
+    if (!u) return;
+    const amount = parseFloat(document.getElementById('adminBalAmount').value) || 0;
+    const desc   = document.getElementById('adminBalDesc').value.trim() || 'Saldo por Admin';
+    if (amount <= 0) return showToast('error', 'Monto inválido');
+    u.balance = (u.balance||0) + amount;
+    u.tx = u.tx || [];
+    u.tx.push({ desc:`💰 ${desc}`, amount, type:'bonus', date:new Date().toLocaleString() });
+    db[ukey] = u; saveDB(db);
+    closeAdminModal(); renderAdminPanel();
+    showToast('success', `$${amount.toFixed(2)} enviado a ${u.username}`);
+}
+
+function adminSendMessage(ukey) {
+    const db = getDB(); const u = db[ukey];
+    if (!u) return;
+    openAdminModal(`Mensaje a ${u.username}`, `
+        <textarea class="admin-input" id="adminMsgText" placeholder="Escribe el mensaje..." style="height:90px;resize:none;padding:12px;"></textarea>
+        <button class="btn-admin-action" onclick="confirmSendMessage('${ukey}')">ENVIAR</button>`);
+}
+function confirmSendMessage(ukey) {
+    const db = getDB(); const u = db[ukey];
+    if (!u) return;
+    const text = document.getElementById('adminMsgText').value.trim();
+    if (!text) return showToast('error', 'Escribe un mensaje');
+    u.adminMessages = u.adminMessages || [];
+    u.adminMessages.push({ text, date:new Date().toLocaleString() });
+    db[ukey] = u; saveDB(db);
+    closeAdminModal(); renderAdminPanel();
+    showToast('success', `Mensaje enviado a ${u.username}`);
+}
+
+function adminViewReferrals(ukey) {
+    const db = getDB(); const u = db[ukey];
+    if (!u) return;
+    const refs = u.referrals || [];
+    let html = `<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px;">Total: <strong style="color:#fff;">${refs.length}</strong> · Ganado: <strong style="color:var(--accent);font-family:'DM Mono',monospace;">$${(u.referralEarned||0).toFixed(2)}</strong></div>`;
+    if (!refs.length) {
+        html += `<div style="text-align:center;color:var(--text-muted);padding:20px;font-size:0.83rem;">Sin referidos aún.</div>`;
+    } else {
+        refs.forEach(rkey => {
+            const ref = db[rkey];
+            if (ref) html += `<div style="background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;padding:11px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-weight:600;font-size:0.88rem;">${ref.username}</div><div style="font-size:0.68rem;color:var(--text-muted);">${ref.membership?ref.membership.toUpperCase():'SIN PLAN'}</div></div><div style="font-family:'DM Mono',monospace;color:var(--accent);font-size:0.88rem;">$${(ref.balance||0).toFixed(2)}</div></div>`;
         });
     }
-    function startMarketLoop() {
-        setInterval(() => {
-            cryptoData.forEach(asset => {
-                const v = (asset.id==='sol'||asset.id==='xrp') ? 0.003 : 0.0015;
-                const c = (Math.random()*2-1)*v;
-                asset.price = Math.max(0.01, asset.price*(1+c));
-                asset.change = c*100;
-            });
-            const avg = cryptoData.reduce((acc,c)=>acc+c.price,0)/1000;
-            priceHistory.push(avg);
-            if (priceHistory.length > 10) priceHistory.shift();
-            if (chartInstance) { chartInstance.data.datasets[0].data = priceHistory; chartInstance.update(); }
-            if (document.getElementById('tradeModal').style.display === 'flex') {
-                const asset = cryptoData.find(a=>a.id===activeCrypto);
-                document.getElementById('tradePrice').innerText = formatUSD(asset.price);
-                calcConv();
-            }
-            updateUI();
-        }, 6000);
-    }
- 
-    // ═══════════════════════════════════════════════════════
-    //  TOAST
-    // ═══════════════════════════════════════════════════════
-    function showToast(type, text) {
-        const container = document.getElementById('toastContainer');
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        let icon = 'fa-circle-info';
-        if (type==='success') icon='fa-circle-check';
-        if (type==='error')   icon='fa-triangle-exclamation';
-        toast.innerHTML = `<i class="fa-solid ${icon}"></i><span>${text}</span>`;
-        container.appendChild(toast);
-        setTimeout(() => { toast.style.animation='slideIn 0.3s ease reverse forwards'; setTimeout(()=>toast.remove(),300); }, 3000);
-    }
- 
-    function logout() {
-        localStorage.removeItem('fnl_active_user');
-        user = null;
-        document.getElementById('dashboard').style.display = 'none';
-        showAuthSection();
-        showToast('info', 'Sesión cerrada');
-    }
- 
-    // ═══════════════════════════════════════════════════════
-    //  ██████  ADMIN PANEL  ██████
-    // ═══════════════════════════════════════════════════════
-    function handleAdminLogin() {
-        const u = document.getElementById('adminUserIn').value.trim();
-        const p = document.getElementById('adminPassIn').value;
-        if (u === ADMIN_USER && p === ADMIN_PASS) {
-            localStorage.setItem('fnl_active_user', '__admin__');
-            showAdminPanel();
-        } else {
-            showToast('error', 'Credenciales de administrador incorrectas');
-        }
-    }
- 
-    function showAdminPanel() {
-        document.getElementById('authSection').style.display = 'none';
-        document.getElementById('adminLoginSection').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'none';
-        document.getElementById('adminDashboard').style.display = 'block';
-        renderAdminPanel();
-    }
- 
-    function adminLogout() {
-        localStorage.removeItem('fnl_active_user');
-        document.getElementById('adminDashboard').style.display = 'none';
-        showAuthSection();
-        showToast('info', 'Sesión de administrador cerrada');
-    }
- 
-    function renderAdminPanel() {
-        const db = getDB();
-        const users = Object.values(db);
-        const totalBalance = users.reduce((a,u) => a + (u.balance||0), 0);
-        const withMem = users.filter(u => u.membership).length;
- 
-        // Stats
-        document.getElementById('adminStats').innerHTML = `
-            <div class="admin-stat-card"><div class="admin-stat-val">${users.length}</div><div class="admin-stat-label">Usuarios Totales</div></div>
-            <div class="admin-stat-card"><div class="admin-stat-val">${withMem}</div><div class="admin-stat-label">Con Membresía</div></div>
-            <div class="admin-stat-card"><div class="admin-stat-val">$${totalBalance.toFixed(2)}</div><div class="admin-stat-label">Saldo Total (USDT)</div></div>
-        `;
- 
-        // User list
-        const listEl = document.getElementById('adminUserList');
-        listEl.innerHTML = '';
-        if (users.length === 0) {
-            listEl.innerHTML = '<div style="color:var(--text-muted);padding:20px;text-align:center;">No hay usuarios registrados aún.</div>';
-            return;
-        }
-        users.forEach(u => {
-            const refs = (u.referrals||[]).length;
-            const invBy = u.referredBy ? u.referredBy : '—';
-            const card = document.createElement('div');
-            card.className = 'admin-user-card';
-            card.innerHTML = `
-                <div class="admin-user-header">
-                    <div>
-                        <div class="admin-user-name">${u.username} <span style="font-size:0.7rem;color:var(--text-muted);font-weight:400;">(${u.joinDate||'—'})</span></div>
-                        <div class="admin-user-meta">Código: <strong style="color:var(--accent);">${u.refCode||'—'}</strong> · Invitado por: <strong>${invBy}</strong></div>
-                    </div>
-                    <div style="text-align:right;">
-                        <div style="font-size:1.1rem;font-weight:700;color:var(--accent);">$${(u.balance||0).toFixed(2)} USDT</div>
-                        <div style="font-size:0.7rem;color:var(--text-muted);">Membresía: <strong style="color:#fff;">${u.membership ? u.membership.toUpperCase() : 'NINGUNA'}</strong></div>
-                    </div>
-                </div>
-                <div class="admin-info-row">
-                    <span><i class="fa-solid fa-user-plus" style="color:var(--primary);"></i> Referidos: <strong>${refs}</strong></span>
-                    <span><i class="fa-solid fa-dollar-sign" style="color:var(--accent);"></i> Ganado x refs: <strong>$${(u.referralEarned||0).toFixed(2)}</strong></span>
-                    <span><i class="fa-solid fa-money-bill" style="color:var(--warning);"></i> Retiros: <strong>${(u.withdrawals||[]).length}</strong></span>
-                </div>
-                <div class="admin-user-actions">
-                    <button class="admin-btn orange" onclick="adminChangeMem('${u.username.toLowerCase()}')"><i class="fa-solid fa-crown"></i> Cambiar Membresía</button>
-                    <button class="admin-btn green"  onclick="adminSendBalance('${u.username.toLowerCase()}')"><i class="fa-solid fa-paper-plane"></i> Enviar Saldo</button>
-                    <button class="admin-btn red"    onclick="adminSendMessage('${u.username.toLowerCase()}')"><i class="fa-solid fa-bullhorn"></i> Advertencia</button>
-                    <button class="admin-btn blue"   onclick="adminViewReferrals('${u.username.toLowerCase()}')"><i class="fa-solid fa-users"></i> Ver Referidos</button>
-                </div>
-            `;
-            listEl.appendChild(card);
-        });
-    }
- 
-    // Admin modal helpers
-    function openAdminModal(title, html) {
-        document.getElementById('adminModalTitle').innerText = title;
-        document.getElementById('adminModalContent').innerHTML = html;
-        document.getElementById('adminModal').style.display = 'flex';
-    }
-    function closeAdminModal() {
-        document.getElementById('adminModal').style.display = 'none';
-    }
- 
-    function adminChangeMem(ukey) {
-        const db = getDB(); const u = db[ukey];
-        openAdminModal(`Cambiar Membresía: ${u.username}`, `
-            <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;">Membresía actual: <strong style="color:#fff;">${u.membership ? u.membership.toUpperCase() : 'NINGUNA'}</strong></div>
-            <select class="admin-select" id="adminMemSelect">
-                <option value="">— Sin membresía —</option>
-                <option value="basic">Basic ($5)</option>
-                <option value="premium">Premium ($10)</option>
-                <option value="vip">VIP ($20)</option>
-                <option value="platinum">Platinum ($50)</option>
-                <option value="elite">Elite ($100)</option>
-            </select>
-            <button class="btn-admin-action" onclick="confirmChangeMem('${ukey}')">CONFIRMAR CAMBIO</button>
-        `);
-        document.getElementById('adminMemSelect').value = u.membership || '';
-    }
- 
-    function confirmChangeMem(ukey) {
-        const db = getDB(); const u = db[ukey];
-        const newMem = document.getElementById('adminMemSelect').value;
-        u.membership = newMem || null;
-        if (newMem) u.membershipBuyTime = Date.now();
-        db[ukey] = u;
-        saveDB(db);
-        closeAdminModal();
-        renderAdminPanel();
-        showToast('success', `Membresía de ${u.username} actualizada.`);
-    }
- 
-    function adminSendBalance(ukey) {
-        const db = getDB(); const u = db[ukey];
-        openAdminModal(`Enviar Saldo a ${u.username}`, `
-            <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;">Saldo actual: <strong style="color:var(--accent);">$${(u.balance||0).toFixed(2)} USDT</strong></div>
-            <input type="number" class="admin-input" id="adminBalAmount" placeholder="Monto USDT (ej: 10.00)" min="0.01" step="0.01">
-            <input type="text" class="admin-input" id="adminBalDesc" placeholder="Descripción (ej: Bono especial)">
-            <button class="btn-admin-action" onclick="confirmSendBalance('${ukey}')">ENVIAR SALDO</button>
-        `);
-    }
- 
-    function confirmSendBalance(ukey) {
-        const db = getDB(); const u = db[ukey];
-        const amount = parseFloat(document.getElementById('adminBalAmount').value) || 0;
-        const desc   = document.getElementById('adminBalDesc').value.trim() || 'Saldo enviado por Admin';
-        if (amount <= 0) return showToast('error', 'Monto inválido');
-        u.balance = (u.balance||0) + amount;
-        u.tx = u.tx||[];
-        u.tx.push({ desc: `💰 ${desc}`, amount, type: 'bonus', date: new Date().toLocaleString() });
-        db[ukey] = u; saveDB(db);
-        closeAdminModal(); renderAdminPanel();
-        showToast('success', `$${amount.toFixed(2)} enviado a ${u.username}.`);
-    }
- 
-    function adminSendMessage(ukey) {
-        const db = getDB(); const u = db[ukey];
-        openAdminModal(`Mensaje / Advertencia a ${u.username}`, `
-            <textarea class="admin-input" id="adminMsgText" placeholder="Escribe el mensaje o advertencia..." style="height:100px;resize:none;padding:12px;"></textarea>
-            <button class="btn-admin-action" onclick="confirmSendMessage('${ukey}')">ENVIAR MENSAJE</button>
-        `);
-    }
- 
-    function confirmSendMessage(ukey) {
-        const db = getDB(); const u = db[ukey];
-        const text = document.getElementById('adminMsgText').value.trim();
-        if (!text) return showToast('error', 'Escribe un mensaje');
-        u.adminMessages = u.adminMessages||[];
-        u.adminMessages.push({ text, date: new Date().toLocaleString() });
-        db[ukey] = u; saveDB(db);
-        closeAdminModal(); renderAdminPanel();
-        showToast('success', `Mensaje enviado a ${u.username}.`);
-    }
- 
-    function adminViewReferrals(ukey) {
-        const db = getDB(); const u = db[ukey];
-        const refs = (u.referrals||[]);
-        let html = `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;">Total de referidos: <strong style="color:#fff;">${refs.length}</strong> · Ganado: <strong style="color:var(--accent);">$${(u.referralEarned||0).toFixed(2)}</strong></div>`;
-        if (refs.length === 0) {
-            html += `<div style="text-align:center;color:var(--text-muted);padding:20px;">Este usuario no tiene referidos aún.</div>`;
-        } else {
-            refs.forEach(rkey => {
-                const ref = db[rkey];
-                if (ref) {
-                    html += `<div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
-                        <div><div style="font-weight:600;">${ref.username}</div><div style="font-size:0.7rem;color:var(--text-muted);">Membresía: ${ref.membership ? ref.membership.toUpperCase() : 'NINGUNA'}</div></div>
-                        <div style="text-align:right;font-size:0.8rem;color:var(--accent);">$${(ref.balance||0).toFixed(2)}</div>
-                    </div>`;
-                }
-            });
-        }
-        openAdminModal(`Referidos de ${u.username}`, html);
-    }
-    </script>
+    openAdminModal(`Referidos de ${u.username}`, html);
+}
+
+// ─── DB Export / Import ───
+function exportDB() {
+    const db = getDB();
+    const blob = new Blob([JSON.stringify(db, null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `fnl_db_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    showToast('success', 'Base de datos exportada');
+}
+function importDB() {
+    document.getElementById('dbFileInput').click();
+}
+function handleImportDB(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const imported = JSON.parse(e.target.result);
+            const existing = getDB();
+            // Merge: imported wins on conflict
+            const merged = { ...existing, ...imported };
+            saveDB(merged);
+            showToast('success', `DB importada: ${Object.keys(imported).length} usuarios`);
+            renderAdminPanel();
+        } catch { showToast('error', 'Archivo inválido'); }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+}
+</script>
 </body>
 </html>
