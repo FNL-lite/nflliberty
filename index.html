@@ -9,6 +9,83 @@
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, onSnapshot, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAoURhKrrv-H934vqLmyfRIjDMaYUnceLE",
+            authDomain: "latinfinancial-4766a.firebaseapp.com",
+            projectId: "latinfinancial-4766a",
+            storageBucket: "latinfinancial-4766a.firebasestorage.app",
+            messagingSenderId: "629202718534",
+            appId: "1:629202718534:web:535a3eca6b97c9562e1f47",
+            measurementId: "G-XH13MYBPV2"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // ── Expose Firestore helpers globally ──
+        window._fs = {
+            db,
+            doc, setDoc, getDoc, collection, getDocs, onSnapshot, updateDoc, serverTimestamp,
+            // Save a user document
+            async saveUser(userData) {
+                try {
+                    const ref = doc(db, 'users', userData.username.toLowerCase());
+                    await setDoc(ref, { ...userData, updatedAt: serverTimestamp() });
+                    return true;
+                } catch(e) { console.error('saveUser:', e); return false; }
+            },
+            // Get a user by username
+            async getUser(username) {
+                try {
+                    const ref = doc(db, 'users', username.toLowerCase());
+                    const snap = await getDoc(ref);
+                    return snap.exists() ? snap.data() : null;
+                } catch(e) { console.error('getUser:', e); return null; }
+            },
+            // Get all users (admin)
+            async getAllUsers() {
+                try {
+                    const snap = await getDocs(collection(db, 'users'));
+                    const users = [];
+                    snap.forEach(d => users.push(d.data()));
+                    return users;
+                } catch(e) { console.error('getAllUsers:', e); return []; }
+            },
+            // Real-time listener for admin
+            listenAllUsers(callback) {
+                return onSnapshot(collection(db, 'users'), (snap) => {
+                    const users = [];
+                    snap.forEach(d => users.push(d.data()));
+                    callback(users);
+                });
+            },
+            // Counter for live investors
+            async getInvestorCount() {
+                try {
+                    const ref = doc(db, 'meta', 'stats');
+                    const snap = await getDoc(ref);
+                    return snap.exists() ? (snap.data().investorCount || 143) : 143;
+                } catch(e) { return 143; }
+            },
+            async incrementInvestorCount(amount) {
+                try {
+                    const ref = doc(db, 'meta', 'stats');
+                    const snap = await getDoc(ref);
+                    const current = snap.exists() ? (snap.data().investorCount || 143) : 143;
+                    await setDoc(ref, { investorCount: current + amount }, { merge: true });
+                    return current + amount;
+                } catch(e) { return null; }
+            }
+        };
+
+        window._fsReady = true;
+        window.dispatchEvent(new Event('fsReady'));
+    </script>
     <style>
         :root {
             --primary: #00d4ff;
@@ -42,14 +119,13 @@
         ::-webkit-scrollbar-track { background: var(--bg-dark); }
         ::-webkit-scrollbar-thumb { background: rgba(0,212,255,0.3); border-radius:3px; }
 
-        /* ── NOISE OVERLAY ── */
         body::before {
             content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
             opacity:.4;
         }
 
-        /* ── LOADER ── */
+        /* LOADER */
         .loader-screen { position:fixed; inset:0; background:var(--bg-dark); z-index:9999; display:flex; flex-direction:column; justify-content:center; align-items:center; transition:opacity 0.6s ease; }
         .loader-screen.hidden { opacity:0; pointer-events:none; }
         .loader-ring { width:56px; height:56px; border:2px solid rgba(0,212,255,0.1); border-top-color:var(--primary); border-radius:50%; animation:spin 0.9s linear infinite; }
@@ -58,25 +134,14 @@
         @keyframes spin { to { transform:rotate(360deg); } }
         @keyframes pulse { 0%,100% { opacity:.4; } 50% { opacity:1; } }
 
-        /* ── TICKER BAR ── */
-        .ticker-bar { background:rgba(0,212,255,0.04); border-bottom:1px solid var(--border); padding:6px 0; overflow:hidden; white-space:nowrap; }
-        .ticker-inner { display:inline-flex; gap:32px; animation:ticker 28s linear infinite; }
-        .ticker-inner:hover { animation-play-state:paused; }
-        .ticker-item { display:inline-flex; align-items:center; gap:7px; font-family:'DM Mono',monospace; font-size:0.72rem; }
-        .ticker-sym { color:var(--primary); font-weight:500; }
-        .ticker-price { color:var(--text); }
-        .ticker-change.up { color:var(--accent); }
-        .ticker-change.down { color:var(--danger); }
-        @keyframes ticker { from { transform:translateX(0); } to { transform:translateX(-50%); } }
-
-        /* ── TOAST ── */
+        /* TOAST */
         .toast-container { position:fixed; top:20px; right:20px; z-index:10000; display:flex; flex-direction:column; gap:8px; }
         .toast { background:var(--bg-card2); border:1px solid var(--border); border-left:3px solid var(--primary); padding:12px 16px; border-radius:12px; min-width:280px; display:flex; align-items:center; gap:10px; animation:slideIn 0.3s ease forwards; box-shadow:0 12px 32px rgba(0,0,0,0.6), var(--glow); font-size:0.85rem; }
         .toast.success { border-left-color:var(--success); }
         .toast.error { border-left-color:var(--danger); }
         @keyframes slideIn { from { transform:translateX(110%); opacity:0; } to { transform:translateX(0); opacity:1; } }
 
-        /* ── AUTH ── */
+        /* AUTH */
         .auth-view { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; background:radial-gradient(ellipse 60% 50% at 50% 0%, rgba(0,212,255,0.1) 0%, transparent 70%), var(--bg-dark); position:relative; z-index:1; }
         .auth-card { background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:24px; padding:38px 34px; width:100%; max-width:390px; backdrop-filter:blur(20px); box-shadow:0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.03); position:relative; overflow:hidden; }
         .auth-card::before { content:''; position:absolute; top:-80px; right:-60px; width:200px; height:200px; background:radial-gradient(circle, rgba(0,212,255,0.08), transparent 70%); pointer-events:none; }
@@ -119,7 +184,7 @@
         .mem-platinum { background:linear-gradient(135deg,#00d4ff,#0891b2); color:#000; }
         .mem-elite { background:linear-gradient(135deg,#ff4757,#c0392b); color:white; }
 
-        /* ── APP ── */
+        /* APP */
         .app-view { display:none; min-height:100vh; padding-bottom:115px; position:relative; z-index:1; }
 
         .top-nav { background:rgba(4,4,10,0.92); backdrop-filter:blur(20px); padding:10px 18px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; border-bottom:1px solid var(--border); }
@@ -136,7 +201,7 @@
         .panel-header { margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; }
         .panel-title { font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:700; border-left:3px solid var(--primary); padding-left:10px; }
 
-        /* ── HERO ── */
+        /* HERO */
         .hero-banner { background:linear-gradient(135deg, rgba(0,212,255,0.07), rgba(123,47,247,0.05), rgba(0,255,136,0.04)); border:1px solid rgba(0,212,255,0.12); border-radius:20px; padding:22px 20px; margin-bottom:18px; position:relative; overflow:hidden; }
         .hero-banner::before { content:''; position:absolute; top:-40px; right:-40px; width:160px; height:160px; background:radial-gradient(circle, rgba(0,212,255,0.12), transparent 70%); }
         .hero-banner::after { content:''; position:absolute; bottom:-30px; left:30%; width:120px; height:120px; background:radial-gradient(circle, rgba(0,255,136,0.08), transparent 70%); }
@@ -148,7 +213,7 @@
         .mini-bal-label { font-size:0.65rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
         .mini-bal-val { font-family:'DM Mono',monospace; font-size:1.05rem; font-weight:500; color:var(--primary); }
 
-        /* ── CYCLE PROGRESS ── */
+        /* CYCLE PROGRESS */
         .cycle-card { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:18px; margin-bottom:16px; }
         .cycle-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
         .cycle-title { font-size:0.8rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
@@ -158,7 +223,7 @@
         .cycle-info-row { display:flex; justify-content:space-between; margin-top:10px; font-size:0.75rem; color:var(--text-muted); }
         .cycle-info-row span strong { color:var(--text); }
 
-        /* ── STATS ── */
+        /* STATS */
         .card-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:18px; }
         @media(max-width:480px) { .card-grid { grid-template-columns:1fr; } }
         .stat-card { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:18px; transition:0.25s; }
@@ -167,7 +232,7 @@
         .stat-value { font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:700; margin-bottom:3px; }
         .stat-label { font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
 
-        /* ── EARNINGS TICKER ── */
+        /* EARNINGS */
         .earnings-display { background:linear-gradient(135deg, rgba(0,255,136,0.06), rgba(0,212,255,0.03)); border:1px solid rgba(0,255,136,0.15); border-radius:14px; padding:14px 18px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
         .earnings-left { display:flex; align-items:center; gap:10px; }
         .earnings-icon { width:36px; height:36px; border-radius:10px; background:rgba(0,255,136,0.1); display:flex; align-items:center; justify-content:center; color:var(--accent); }
@@ -175,7 +240,7 @@
         .earnings-value { font-family:'DM Mono',monospace; font-size:1.15rem; font-weight:500; color:var(--accent); }
         .daily-badge { background:rgba(0,255,136,0.1); border:1px solid rgba(0,255,136,0.2); border-radius:20px; padding:4px 12px; font-size:0.72rem; color:var(--accent); font-weight:600; }
 
-        /* ── CHART ── */
+        /* CHART */
         .chart-box { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:18px; margin-bottom:18px; }
         .chart-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
         .chart-title { font-family:'Syne',sans-serif; font-size:0.95rem; font-weight:700; }
@@ -185,7 +250,7 @@
         .chart-tab { padding:5px 12px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--text-muted); font-size:0.72rem; cursor:pointer; transition:0.2s; font-family:'DM Sans',sans-serif; }
         .chart-tab.active { background:rgba(0,212,255,0.1); border-color:var(--primary); color:var(--primary); }
 
-        /* ── CRYPTO ── */
+        /* CRYPTO */
         .crypto-list { display:flex; flex-direction:column; gap:8px; }
         .crypto-item { background:var(--bg-card); border:1px solid var(--border); border-radius:13px; padding:13px 15px; display:flex; justify-content:space-between; align-items:center; transition:0.2s; cursor:pointer; }
         .crypto-item:hover { background:var(--bg-card2); transform:translateX(4px); border-color:var(--border2); }
@@ -199,7 +264,7 @@
         .price-tag.up { background:rgba(0,255,136,0.1); color:var(--accent); }
         .price-tag.down { background:rgba(255,71,87,0.1); color:var(--danger); }
 
-        /* ── NEWS FEED ── */
+        /* NEWS */
         .news-section { margin-bottom:18px; }
         .news-item { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:13px 15px; margin-bottom:8px; display:flex; gap:12px; align-items:flex-start; transition:0.2s; cursor:pointer; }
         .news-item:hover { border-color:var(--border2); }
@@ -209,7 +274,7 @@
         .news-title { font-size:0.83rem; font-weight:600; margin-bottom:3px; line-height:1.4; }
         .news-meta { font-size:0.68rem; color:var(--text-muted); }
 
-        /* ── MEMBERSHIPS ── */
+        /* MEMBERSHIPS */
         .mem-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:22px; }
         @media(max-width:950px) { .mem-grid { grid-template-columns:repeat(3,1fr); } }
         @media(max-width:600px) { .mem-grid { grid-template-columns:repeat(2,1fr); } }
@@ -237,7 +302,7 @@
         .mem-bonus { font-size:0.68rem; color:var(--warning); font-weight:700; margin-top:6px; background:rgba(255,212,59,0.06); border-radius:6px; padding:3px 0; }
         .mem-popular { position:absolute; top:14px; right:-18px; background:var(--warning); color:#000; font-size:0.58rem; font-weight:700; padding:2px 20px; transform:rotate(45deg); letter-spacing:0.5px; }
 
-        /* ── WALLET ── */
+        /* WALLET */
         .wallet-address-box { background:rgba(0,212,255,0.03); border:1px solid rgba(0,212,255,0.15); border-radius:16px; padding:18px; margin-bottom:18px; }
         .wallet-address-label { font-size:0.68rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
         .wallet-address-label i { color:var(--primary); }
@@ -247,7 +312,7 @@
         .wallet-copy-btn.copied { color:var(--accent); background:rgba(0,255,136,0.08); }
         .wallet-network-tag { display:inline-block; background:rgba(0,212,255,0.08); border:1px solid rgba(0,212,255,0.2); padding:3px 10px; border-radius:6px; font-size:0.63rem; font-weight:700; color:var(--primary); margin-bottom:10px; font-family:'DM Mono',monospace; }
 
-        /* ── REFERRAL ── */
+        /* REFERRAL */
         .referral-box { background:linear-gradient(135deg,rgba(0,255,136,0.04),rgba(0,212,255,0.03)); border:1px solid rgba(0,255,136,0.15); border-radius:16px; padding:18px; margin-bottom:18px; }
         .referral-code { font-family:'DM Mono',monospace; font-size:1.5rem; font-weight:500; color:var(--accent); letter-spacing:5px; text-align:center; padding:14px; background:rgba(0,255,136,0.05); border-radius:10px; cursor:pointer; border:1px dashed rgba(0,255,136,0.25); transition:0.2s; margin:12px 0; }
         .referral-code:hover { background:rgba(0,255,136,0.1); }
@@ -256,7 +321,7 @@
         .ref-stat-val { font-family:'DM Mono',monospace; font-size:1.15rem; font-weight:500; color:var(--primary); }
         .ref-stat-label { font-size:0.63rem; color:var(--text-muted); margin-top:3px; text-transform:uppercase; }
 
-        /* ── HOLDINGS ── */
+        /* HOLDINGS */
         .holdings-grid { display:flex; flex-direction:column; gap:8px; }
         .holding-row { background:var(--bg-card); border-radius:12px; padding:14px; display:flex; justify-content:space-between; align-items:center; border:1px solid var(--border); }
         .holding-row .val { font-family:'DM Mono',monospace; font-weight:500; font-size:1rem; }
@@ -264,7 +329,7 @@
         .holding-row.success { border-left:3px solid var(--success); }
         .holding-row.pending { border-left:3px solid var(--warning); }
 
-        /* ── WITHDRAW ── */
+        /* WITHDRAW */
         .withdraw-card { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:20px; margin-bottom:14px; }
         .withdraw-status { display:flex; justify-content:space-between; margin-bottom:12px; align-items:center; }
         .status-badge { padding:4px 10px; border-radius:20px; font-size:0.68rem; font-weight:700; font-family:'DM Mono',monospace; }
@@ -285,19 +350,19 @@
         .locked-overlay i { font-size:1.8rem; color:var(--warning); margin-bottom:10px; }
         .locked-overlay p { font-size:0.82rem; margin-top:5px; }
 
-        /* ── ADMIN MSG ── */
+        /* ADMIN MSG */
         .admin-msg-box { background:rgba(255,71,87,0.04); border:1px solid rgba(255,71,87,0.2); border-radius:12px; padding:14px; margin-bottom:12px; }
         .admin-msg-header { font-size:0.63rem; color:var(--danger); text-transform:uppercase; letter-spacing:1px; font-weight:700; margin-bottom:6px; display:flex; align-items:center; gap:5px; }
         .admin-msg-text { font-size:0.86rem; color:#eee; line-height:1.5; }
 
-        /* ── BOTTOM NAV ── */
+        /* BOTTOM NAV */
         .bottom-nav { position:fixed; bottom:0; left:0; right:0; background:rgba(4,4,10,0.97); padding:8px 0 env(safe-area-inset-bottom,8px); border-top:1px solid var(--border); z-index:99; display:flex; justify-content:space-around; backdrop-filter:blur(20px); }
         .nav-btn { display:flex; flex-direction:column; align-items:center; color:var(--text-muted); font-size:0.58rem; cursor:pointer; transition:0.2s; background:none; border:none; outline:none; padding:2px 6px; gap:4px; font-family:'DM Sans',sans-serif; font-weight:500; letter-spacing:0.3px; }
         .nav-btn i { font-size:1.1rem; transition:0.2s; }
         .nav-btn.active { color:var(--primary); }
         .nav-btn.active i { filter:drop-shadow(0 0 6px var(--primary)); }
 
-        /* ── MODALS ── */
+        /* MODALS */
         .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.88); backdrop-filter:blur(8px); z-index:1000; display:none; justify-content:center; align-items:flex-end; padding:0; }
         @media(min-width:600px) { .modal-overlay { align-items:center; padding:20px; } }
         .modal-box { background:var(--bg-card2); border:1px solid var(--border); border-radius:24px 24px 0 0; padding:24px; width:100%; max-width:420px; animation:slideUp 0.3s ease; }
@@ -318,7 +383,7 @@
         .btn-half { flex:1; padding:12px; border-radius:10px; border:1px solid var(--border); background:rgba(255,255,255,0.03); color:white; font-weight:700; cursor:pointer; transition:0.2s; font-family:'DM Sans',sans-serif; }
         .btn-half:hover { background:rgba(255,255,255,0.08); }
 
-        /* ── ADMIN PANEL ── */
+        /* ADMIN */
         .admin-view { display:none; min-height:100vh; background:var(--admin-bg); position:relative; z-index:1; }
         .admin-nav { background:rgba(8,6,4,0.95); border-bottom:1px solid rgba(255,107,53,0.15); padding:12px 20px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; }
         .admin-nav-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; color:var(--admin-primary); letter-spacing:2px; }
@@ -331,7 +396,9 @@
         .admin-stat-label { font-size:0.68rem; color:var(--text-muted); text-transform:uppercase; margin-top:3px; letter-spacing:0.5px; }
         .admin-section-title { font-family:'Syne',sans-serif; font-size:0.95rem; font-weight:700; color:var(--admin-primary); border-left:3px solid var(--admin-primary); padding-left:10px; margin-bottom:14px; }
 
-        /* Admin search */
+        .admin-sync-info { background:rgba(0,255,136,0.04); border:1px solid rgba(0,255,136,0.15); border-radius:12px; padding:12px 16px; margin-bottom:16px; font-size:0.78rem; color:var(--accent); display:flex; align-items:center; gap:10px; }
+        .admin-sync-info i { font-size:1rem; }
+
         .admin-search { width:100%; padding:10px 14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,107,53,0.15); border-radius:10px; color:white; font-size:0.88rem; outline:none; margin-bottom:16px; font-family:'DM Sans',sans-serif; }
         .admin-search:focus { border-color:var(--admin-primary); }
         .admin-search::placeholder { color:var(--text-muted); }
@@ -353,7 +420,7 @@
         .admin-info-row { display:flex; gap:16px; flex-wrap:wrap; font-size:0.78rem; color:var(--text-muted); }
         .admin-info-row span strong { color:#fff; font-family:'DM Mono',monospace; }
 
-        /* Admin modal */
+        /* ADMIN MODAL */
         .admin-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:2000; display:none; justify-content:center; align-items:center; padding:20px; }
         .admin-modal-box { background:#100a06; border:1px solid rgba(255,107,53,0.25); border-radius:18px; padding:24px; width:100%; max-width:380px; animation:popIn 0.3s ease; }
         .admin-modal-title { font-family:'Syne',sans-serif; font-size:0.95rem; font-weight:700; color:var(--admin-primary); margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; }
@@ -364,14 +431,14 @@
         .btn-admin-action { width:100%; padding:12px; border-radius:10px; border:none; background:var(--admin-primary); color:#000; font-weight:700; font-size:0.9rem; cursor:pointer; transition:0.2s; font-family:'Syne',sans-serif; }
         .btn-admin-action:hover { opacity:0.85; }
 
-        /* Admin login */
+        /* ADMIN LOGIN */
         .admin-login-view { min-height:100vh; display:flex; align-items:center; justify-content:center; background:radial-gradient(ellipse 50% 40% at 50% 0%, rgba(255,107,53,0.08), transparent 70%), var(--admin-bg); padding:20px; position:relative; z-index:1; }
         .admin-login-card { background:rgba(255,107,53,0.02); border:1px solid rgba(255,107,53,0.15); border-radius:22px; padding:34px; width:100%; max-width:360px; }
         .admin-brand { text-align:center; margin-bottom:24px; }
         .admin-brand h1 { font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; color:var(--admin-primary); letter-spacing:3px; }
         .admin-brand p { font-size:0.7rem; color:var(--text-muted); margin-top:5px; letter-spacing:1px; font-family:'DM Mono',monospace; }
 
-        /* PIN pad */
+        /* PIN */
         .pin-display { display:flex; justify-content:center; gap:10px; margin:14px 0 18px; }
         .pin-dot { width:12px; height:12px; border-radius:50%; border:2px solid rgba(255,107,53,0.4); transition:0.2s; }
         .pin-dot.filled { background:var(--admin-primary); border-color:var(--admin-primary); }
@@ -382,14 +449,9 @@
         .pin-key.del { color:var(--danger); }
         .pin-key.zero { grid-column:2; }
 
-        /* ─── IMPORTANT NOTICE ─── */
-        .sync-notice { background:rgba(255,212,59,0.06); border:1px solid rgba(255,212,59,0.2); border-radius:12px; padding:12px 16px; margin-bottom:16px; font-size:0.78rem; color:var(--warning); line-height:1.5; }
-        .sync-notice strong { display:block; margin-bottom:4px; }
-        .sync-actions { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
-        .sync-btn { padding:6px 12px; border-radius:8px; border:1px solid rgba(255,212,59,0.3); background:rgba(255,212,59,0.08); color:var(--warning); font-size:0.72rem; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; transition:0.2s; }
-        .sync-btn:hover { background:rgba(255,212,59,0.15); }
-        .sync-btn.import { border-color:rgba(0,255,136,0.3); background:rgba(0,255,136,0.06); color:var(--accent); }
-        .sync-btn.import:hover { background:rgba(0,255,136,0.12); }
+        /* LOADING STATE */
+        .loading-state { display:flex; align-items:center; justify-content:center; gap:10px; padding:30px; color:var(--text-muted); font-size:0.83rem; }
+        .loading-state .spin { width:18px; height:18px; border:2px solid rgba(255,107,53,0.2); border-top-color:var(--admin-primary); border-radius:50%; animation:spin 0.8s linear infinite; }
     </style>
 </head>
 <body>
@@ -437,26 +499,21 @@
     <nav class="admin-nav">
         <div class="admin-nav-logo"><i class="fa-solid fa-shield-halved"></i> FNL ADMIN</div>
         <div style="display:flex;align-items:center;gap:10px;">
-            <span class="admin-badge">ADMINISTRADOR</span>
+            <span class="admin-badge">TIEMPO REAL</span>
             <button onclick="adminLogout()" style="background:rgba(255,71,87,0.1);border:1px solid rgba(255,71,87,0.2);color:var(--danger);padding:6px 12px;border-radius:8px;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">
                 <i class="fa-solid fa-right-from-bracket"></i> Salir
             </button>
         </div>
     </nav>
     <div class="admin-main">
-        <div class="sync-notice">
-            <strong><i class="fa-solid fa-triangle-exclamation"></i> Aviso importante sobre sincronización</strong>
-            Los datos se guardan localmente en este navegador. Para ver usuarios de otros dispositivos, usa <strong>Exportar DB</strong> desde ese dispositivo e <strong>Importar DB</strong> aquí.
-            <div class="sync-actions">
-                <button class="sync-btn" onclick="exportDB()"><i class="fa-solid fa-download"></i> Exportar DB</button>
-                <button class="sync-btn import" onclick="importDB()"><i class="fa-solid fa-upload"></i> Importar DB</button>
-                <button class="sync-btn" style="border-color:rgba(0,212,255,0.3);background:rgba(0,212,255,0.06);color:var(--primary);" onclick="renderAdminPanel()"><i class="fa-solid fa-rotate"></i> Actualizar</button>
-            </div>
+        <div class="admin-sync-info">
+            <i class="fa-solid fa-circle-check"></i>
+            <span><strong>Sincronización en tiempo real activa.</strong> Los usuarios aparecen automáticamente desde cualquier dispositivo del mundo.</span>
         </div>
         <div class="admin-stats" id="adminStats"></div>
         <div class="admin-section-title"><i class="fa-solid fa-users"></i> Usuarios Registrados</div>
         <input class="admin-search" id="adminSearch" placeholder="🔍  Buscar por nombre de usuario..." oninput="filterAdminUsers()">
-        <div id="adminUserList"></div>
+        <div id="adminUserList"><div class="loading-state"><div class="spin"></div> Cargando usuarios...</div></div>
     </div>
 </div>
 
@@ -470,7 +527,7 @@
 
         <div class="live-users-badge">
             <div class="live-dot"></div>
-            <span style="color:var(--text-muted);font-size:0.73rem;"><strong id="liveUserCount" style="color:var(--accent);">1,247</strong> inversores activos ahora</span>
+            <span style="color:var(--text-muted);font-size:0.73rem;"><strong id="liveUserCount" style="color:var(--accent);">143</strong> inversores activos ahora</span>
         </div>
 
         <div class="input-group" id="refCodeGroup" style="display:none;">
@@ -502,11 +559,7 @@
 
 <!-- ═══════════ APP ═══════════ -->
 <div class="app-view" id="dashboard">
-    <div class="ticker-bar">
-        <div class="ticker-inner" id="tickerInner">
-            <!-- populated by JS -->
-        </div>
-    </div>
+    <!-- TICKER ELIMINADO según solicitud -->
 
     <nav class="top-nav">
         <div class="nav-logo">FNL</div>
@@ -537,10 +590,8 @@
                 </div>
             </div>
 
-            <!-- Admin messages -->
             <div id="adminMsgsContainer"></div>
 
-            <!-- Earnings display -->
             <div class="earnings-display" id="earningsDisplay" style="display:none;">
                 <div class="earnings-left">
                     <div class="earnings-icon"><i class="fa-solid fa-chart-line"></i></div>
@@ -552,7 +603,6 @@
                 <div class="daily-badge" id="dailyBadge">+$0.00/día</div>
             </div>
 
-            <!-- Cycle progress -->
             <div class="cycle-card" id="cycleCard" style="display:none;">
                 <div class="cycle-header">
                     <span class="cycle-title"><i class="fa-solid fa-rotate"></i> Progreso del ciclo</span>
@@ -598,7 +648,6 @@
             </div>
             <div class="crypto-list" id="cryptoListHome"></div>
 
-            <!-- News feed -->
             <div class="panel-header" style="margin-top:22px;">
                 <h3 class="panel-title">Señales del Mercado</h3>
             </div>
@@ -652,8 +701,6 @@
                     <div class="mem-withdraw">Retiro: $110</div><div class="mem-bonus">🎁 Bono: $7.00</div>
                 </div>
             </div>
-
-            <!-- ROI Table -->
             <div class="chart-box">
                 <div class="chart-header">
                     <span class="chart-title">Proyección de Rendimiento</span>
@@ -819,16 +866,12 @@
     </div>
 </div>
 
-<!-- Hidden file input for DB import -->
-<input type="file" id="dbFileInput" accept=".json" style="display:none;" onchange="handleImportDB(event)">
-
 <script>
 // ═══════════════════════════════════════════════════════
-//  CONFIG & CONSTANTS
+//  CONFIG
 // ═══════════════════════════════════════════════════════
-const DB_KEY     = 'fnl_users_db';
 const ADMIN_USER = 'fnladmin';
-const ADMIN_PIN  = '240689';   // <-- cambia este PIN (6 dígitos)
+const ADMIN_PIN  = '240689';
 const REF_BONUS  = 2.00;
 const WALLET_ADDR = '0x7d34506820fb566468cf41930fcaef81ca7a41a1';
 
@@ -868,34 +911,92 @@ let selectedWithdrawAmount = null;
 let logoClickCount = 0;
 let logoClickTimer = null;
 let pinBuffer = '';
-let liveUsersBase = 1200 + Math.floor(Math.random()*200);
+
+// ── Investor counter (starts at 143, only goes up) ──
+let investorCount = 143;
+let investorCountLoaded = false;
+
+// ── Admin real-time listener ──
+let adminUnsubscribe = null;
+let allUsersCache = [];
 
 // ═══════════════════════════════════════════════════════
-//  INIT
+//  WAIT FOR FIREBASE & INIT
 // ═══════════════════════════════════════════════════════
+function waitForFS(cb) {
+    if (window._fsReady) cb();
+    else window.addEventListener('fsReady', cb, { once: true });
+}
+
 window.onload = () => {
-    // Animate live user count
-    animateLiveUsers();
-    setInterval(animateLiveUsers, 8000);
+    // Start investor counter immediately with local value
+    startInvestorCounter();
+
+    // Try to load real count from Firestore
+    waitForFS(async () => {
+        try {
+            const count = await window._fs.getInvestorCount();
+            if (count > investorCount) {
+                investorCount = count;
+                updateInvestorDisplay();
+            }
+        } catch(e) {}
+    });
 
     setTimeout(() => {
         document.getElementById('loader').classList.add('hidden');
         const saved = localStorage.getItem('fnl_active_user');
-        if (saved === '__admin__') { showAdminPanel(); return; }
+        if (saved === '__admin__') {
+            waitForFS(() => showAdminPanel());
+            return;
+        }
         if (saved) {
-            const db = getDB();
-            user = db[saved.toLowerCase()];
-            if (user) { showDash(); return; }
+            waitForFS(async () => {
+                const u = await window._fs.getUser(saved);
+                if (u) { user = u; showDash(); return; }
+                showAuthSection();
+            });
+            return;
         }
         showAuthSection();
     }, 1400);
 };
 
-function animateLiveUsers() {
-    const delta = Math.floor(Math.random()*15) - 5;
-    liveUsersBase = Math.max(1100, liveUsersBase + delta);
+// ═══════════════════════════════════════════════════════
+//  INVESTOR COUNTER — only goes up, random increments
+// ═══════════════════════════════════════════════════════
+function updateInvestorDisplay() {
     const el = document.getElementById('liveUserCount');
-    if (el) el.innerText = liveUsersBase.toLocaleString();
+    if (el) el.innerText = investorCount.toLocaleString();
+}
+
+function startInvestorCounter() {
+    updateInvestorDisplay();
+
+    // Fluctuate every few seconds, only upward
+    setInterval(() => {
+        // Random increment: 0 to 3
+        const inc = Math.floor(Math.random() * 4);
+        if (inc > 0) {
+            investorCount += inc;
+            updateInvestorDisplay();
+            // Persist to Firestore occasionally (1 in 4 chance to avoid spam)
+            if (Math.random() < 0.25 && window._fsReady) {
+                window._fs.incrementInvestorCount(0).catch(() => {}); // just update the stored value
+                window._fs.getInvestorCount().then(c => {
+                    // sync: take whichever is larger
+                    if (c > investorCount) { investorCount = c; updateInvestorDisplay(); }
+                    else {
+                        // push our value up
+                        window._fs.db && (() => {
+                            const { doc, setDoc } = window._fs;
+                            setDoc(doc(window._fs.db, 'meta', 'stats'), { investorCount }, { merge: true });
+                        })();
+                    }
+                }).catch(() => {});
+            }
+        }
+    }, 3500 + Math.random() * 4000); // every 3.5-7.5 seconds
 }
 
 // ═══════════════════════════════════════════════════════
@@ -967,14 +1068,6 @@ function generateRefCode() {
     for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
     return code;
 }
-function getDB() { try { return JSON.parse(localStorage.getItem(DB_KEY)) || {}; } catch { return {}; } }
-function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
-function saveUserData() {
-    if (!user) return;
-    const db = getDB();
-    db[user.username.toLowerCase()] = user;
-    saveDB(db);
-}
 function fmt(num) { return (num||0).toFixed(2); }
 function fmtUSDT(num) { return fmt(num) + ' USDT'; }
 function fmtUSD(num) { return '$' + fmt(num); }
@@ -985,11 +1078,16 @@ function elapsed() {
     if (!user.membershipBuyTime) return 0;
     return Date.now() - user.membershipBuyTime;
 }
-function cycleDays() {
-    return user.membership ? memberships[user.membership].days : 0;
-}
+function cycleDays() { return user.membership ? memberships[user.membership].days : 0; }
 function cycleMs() { return cycleDays() * 86400000; }
 function daysElapsed() { return elapsed() / 86400000; }
+
+async function saveUserData() {
+    if (!user) return;
+    if (window._fsReady) {
+        await window._fs.saveUser(user);
+    }
+}
 
 // ═══════════════════════════════════════════════════════
 //  AUTH
@@ -1003,19 +1101,47 @@ function toggleAuthMode() {
     return false;
 }
 
-function handleAuth() {
+async function handleAuth() {
     const u = document.getElementById('userIn').value.trim();
     const p = document.getElementById('passIn').value;
     if (!u || !p) return showToast('error', 'Completa todos los campos');
-    const db = getDB();
+
+    const btn = document.getElementById('authBtn');
+    btn.disabled = true;
+    btn.innerText = 'Conectando...';
+
+    if (!window._fsReady) {
+        showToast('error', 'Conectando con el servidor, intenta de nuevo');
+        btn.disabled = false;
+        btn.innerText = isRegister ? 'CREAR CUENTA' : 'ENTRAR A FNL';
+        return;
+    }
 
     if (isRegister) {
-        if (db[u.toLowerCase()]) return showToast('error', 'El usuario ya existe');
+        const existing = await window._fs.getUser(u);
+        if (existing) {
+            showToast('error', 'El usuario ya existe');
+            btn.disabled = false; btn.innerText = 'CREAR CUENTA'; return;
+        }
         const refCode = document.getElementById('refCodeIn').value.trim().toUpperCase();
         let referrerKey = null;
         if (refCode) {
-            referrerKey = Object.keys(db).find(k => db[k].refCode === refCode);
-            if (!referrerKey) return showToast('error', 'Código de invitación no válido');
+            // Find referrer by code
+            const allUsers = await window._fs.getAllUsers();
+            const referrer = allUsers.find(u => u.refCode === refCode);
+            if (!referrer) {
+                showToast('error', 'Código de invitación no válido');
+                btn.disabled = false; btn.innerText = 'CREAR CUENTA'; return;
+            }
+            referrerKey = referrer.username.toLowerCase();
+            // Credit referrer
+            referrer.balance = (referrer.balance || 0) + REF_BONUS;
+            referrer.referralEarned = (referrer.referralEarned || 0) + REF_BONUS;
+            referrer.referrals = referrer.referrals || [];
+            referrer.referrals.push(u.toLowerCase());
+            referrer.tx = referrer.tx || [];
+            referrer.tx.push({ desc:`🎟 Bono referido: ${u}`, amount:REF_BONUS, type:'bonus', date:new Date().toLocaleString() });
+            await window._fs.saveUser(referrer);
         }
         user = {
             username: u, password: p, balance: 0,
@@ -1025,26 +1151,32 @@ function handleAuth() {
             refCode: generateRefCode(), referredBy: referrerKey || null,
             referrals: [], referralEarned: 0, adminMessages: []
         };
-        db[u.toLowerCase()] = user;
-        if (referrerKey) {
-            db[referrerKey].referrals = db[referrerKey].referrals || [];
-            db[referrerKey].referrals.push(u.toLowerCase());
-            db[referrerKey].balance = (db[referrerKey].balance || 0) + REF_BONUS;
-            db[referrerKey].referralEarned = (db[referrerKey].referralEarned || 0) + REF_BONUS;
-            db[referrerKey].tx = db[referrerKey].tx || [];
-            db[referrerKey].tx.push({ desc:`🎟 Bono referido: ${u}`, amount:REF_BONUS, type:'bonus', date:new Date().toLocaleString() });
-        }
-        saveDB(db);
-        showToast('success', '¡Cuenta creada! Inicia sesión');
-        isRegister = false; toggleAuthMode();
-        document.getElementById('refCodeIn').value = '';
-    } else {
-        if (!db[u.toLowerCase()] || db[u.toLowerCase()].password !== p)
-            return showToast('error', 'Credenciales incorrectas');
-        user = db[u.toLowerCase()];
-        // migration
-        if (!user.refCode) { user.refCode = generateRefCode(); user.referrals = []; user.referralEarned = 0; user.adminMessages = []; saveUserData(); }
+        await window._fs.saveUser(user);
         localStorage.setItem('fnl_active_user', u.toLowerCase());
+        // Bump investor count
+        investorCount += 1;
+        updateInvestorDisplay();
+        window._fs.db && (() => {
+            const { doc, setDoc } = window._fs;
+            setDoc(doc(window._fs.db, 'meta', 'stats'), { investorCount }, { merge: true }).catch(()=>{});
+        })();
+        showToast('success', '¡Bienvenido a FNL! Cuenta creada.');
+        btn.disabled = false;
+        showDash();
+    } else {
+        const found = await window._fs.getUser(u);
+        if (!found || found.password !== p) {
+            showToast('error', 'Credenciales incorrectas');
+            btn.disabled = false; btn.innerText = 'ENTRAR A FNL'; return;
+        }
+        user = found;
+        // migration: add missing fields
+        let changed = false;
+        if (!user.refCode) { user.refCode = generateRefCode(); user.referrals = []; user.referralEarned = 0; user.adminMessages = []; changed = true; }
+        if (!user.adminMessages) { user.adminMessages = []; changed = true; }
+        if (changed) await window._fs.saveUser(user);
+        localStorage.setItem('fnl_active_user', u.toLowerCase());
+        btn.disabled = false;
         showDash();
     }
 }
@@ -1079,7 +1211,16 @@ function showDash() {
     initChart();
     startMarketLoop();
     startTimerLoop();
-    buildTicker();
+
+    // Periodically sync user data from Firestore (in case admin made changes)
+    setInterval(async () => {
+        if (!window._fsReady || !user) return;
+        const fresh = await window._fs.getUser(user.username).catch(() => null);
+        if (fresh && JSON.stringify(fresh) !== JSON.stringify(user)) {
+            user = fresh;
+            updateUI();
+        }
+    }, 30000); // every 30s
 }
 
 function switchPanel(btn, id) {
@@ -1150,7 +1291,6 @@ function updateUI() {
         const ac = document.getElementById(`mem-${p}`);
         if (ac) ac.classList.add('selected');
 
-        // Earnings display
         const days = Math.min(daysElapsed(), plan.days);
         const earned = days * plan.daily;
         const earEl = document.getElementById('earningsDisplay');
@@ -1160,7 +1300,6 @@ function updateUI() {
             document.getElementById('dailyBadge').innerText = `+$${plan.daily}/día`;
         }
 
-        // Cycle card
         const pct = Math.min(100, (elapsed() / cycleMs()) * 100);
         const cycCard = document.getElementById('cycleCard');
         if (cycCard) {
@@ -1187,12 +1326,11 @@ function updateUI() {
     document.getElementById('tradeButtonWrapper').style.display = hasMem ? 'block' : 'none';
     document.getElementById('tradeLockedMsg').style.display = hasMem ? 'none' : 'block';
 
-    // Referral stats
-    const db = getDB();
+    // Referral stats (resolve from allUsersCache if in admin, else just use counts)
     const refs = user.referrals || [];
     document.getElementById('refTotal').innerText = refs.length;
     document.getElementById('refEarned').innerText = fmtUSD(user.referralEarned || 0);
-    document.getElementById('refActive').innerText = refs.filter(r => db[r]?.membership).length;
+    document.getElementById('refActive').innerText = refs.length; // approximate
     if (document.getElementById('refCountHome'))
         document.getElementById('refCountHome').innerText = refs.length;
 
@@ -1221,9 +1359,6 @@ function updateUI() {
         listHome.appendChild(card);
     });
 
-    // Ticker
-    buildTicker();
-
     // Portfolio
     const portList = document.getElementById('portfolioList');
     portList.innerHTML = '';
@@ -1236,7 +1371,7 @@ function updateUI() {
         if (amt > 0) {
             const row = document.createElement('div');
             row.className = 'holding-row';
-            row.innerHTML = `<div><div style="font-weight:600;">${asset.name} (${asset.symbol})</div><div class="sub">${amt.toFixed(6)} · $${fmtUSD(asset.price)}</div></div><div class="val" style="text-align:right;"><div>${fmtUSDT(amt*asset.price)}</div><div class="sub">${amt.toFixed(4)} ${asset.symbol}</div></div>`;
+            row.innerHTML = `<div><div style="font-weight:600;">${asset.name} (${asset.symbol})</div><div class="sub">${amt.toFixed(6)} · ${fmtUSD(asset.price)}</div></div><div class="val" style="text-align:right;"><div>${fmtUSDT(amt*asset.price)}</div><div class="sub">${amt.toFixed(4)} ${asset.symbol}</div></div>`;
             portList.appendChild(row);
         }
     });
@@ -1260,26 +1395,12 @@ function updateUI() {
 }
 
 // ═══════════════════════════════════════════════════════
-//  TICKER
-// ═══════════════════════════════════════════════════════
-function buildTicker() {
-    const inner = document.getElementById('tickerInner');
-    if (!inner) return;
-    const items = [...cryptoData, ...cryptoData]; // duplicate for seamless loop
-    inner.innerHTML = items.map(a => {
-        const up = a.change >= 0;
-        return `<div class="ticker-item"><span class="ticker-sym">${a.symbol}</span><span class="ticker-price">${fmtUSD(a.price)}</span><span class="ticker-change ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(a.change).toFixed(2)}%</span></div>`;
-    }).join('');
-}
-
-// ═══════════════════════════════════════════════════════
 //  WALLET COPY
 // ═══════════════════════════════════════════════════════
 function copyWalletAddress() {
     const addr = document.getElementById('depositAddress').innerText;
     const btn = document.getElementById('copyWalletBtn');
     navigator.clipboard.writeText(addr).catch(() => {
-        // fallback
         const ta = document.createElement('textarea');
         ta.value = addr; document.body.appendChild(ta);
         ta.select(); document.execCommand('copy');
@@ -1303,7 +1424,7 @@ function copyRefCode() {
 // ═══════════════════════════════════════════════════════
 //  MEMBERSHIPS
 // ═══════════════════════════════════════════════════════
-function buyMembership(tier) {
+async function buyMembership(tier) {
     const plan = memberships[tier];
     if (!plan) return;
     if (user.membership === tier) return showToast('info', `Ya tienes activa la membresía ${plan.name}`);
@@ -1317,7 +1438,7 @@ function buyMembership(tier) {
     user.membershipBuyTime = Date.now();
     user.tx.push({ desc:`Activación Plan ${plan.name}`, amount:plan.price, type:'spend', date:new Date().toLocaleString() });
     user.tx.push({ desc:`🎁 Bono ${plan.name}`, amount:plan.bonus, type:'bonus', date:new Date().toLocaleString() });
-    saveUserData(); updateUI();
+    await saveUserData(); updateUI();
     showToast('success', `Plan ${plan.name} activado · Bono de $${plan.bonus} recibido 🎉`);
 }
 
@@ -1364,7 +1485,7 @@ function updateWithdrawSection() {
     }
 }
 
-function requestWithdrawal() {
+async function requestWithdrawal() {
     if (!user.membership) return showToast('error', 'Debes activar un plan primero');
     if (elapsed() < cycleMs()) return showToast('error', 'El ciclo aún no ha concluido');
     if (!selectedWithdrawAmount) return showToast('error', 'Selecciona un monto');
@@ -1374,7 +1495,7 @@ function requestWithdrawal() {
     user.withdrawals.push({ amount:gross, fee, net, wallet, date:new Date().toLocaleString() });
     user.tx.push({ desc:`Retiro $${gross} (comisión $${fee})`, amount:gross, type:'spend', date:new Date().toLocaleString() });
     user.membershipBuyTime = Date.now();
-    saveUserData(); updateUI();
+    await saveUserData(); updateUI();
     selectedWithdrawAmount = null;
     document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
     document.getElementById('feeInfoBox').style.display = 'none';
@@ -1424,7 +1545,7 @@ function calcConv() {
         ? `${(v/asset.price).toFixed(6)} ${asset.symbol}`
         : fmtUSDT(v * asset.price);
 }
-function execTrade() {
+async function execTrade() {
     const v = parseFloat(document.getElementById('tradeInput').value) || 0;
     if (v <= 0) return showToast('error', 'Ingresa una cantidad válida');
     const asset = cryptoData.find(a => a.id === activeCrypto);
@@ -1444,7 +1565,7 @@ function execTrade() {
         user.tx.push({ desc:`Venta ${v.toFixed(6)} ${asset.symbol}`, amount:received, type:'gain', date:new Date().toLocaleString() });
         showToast('success', `Vendiste ${v.toFixed(6)} ${asset.symbol} por ${fmtUSDT(received)}`);
     }
-    saveUserData(); closeModal(); updateUI();
+    await saveUserData(); closeModal(); updateUI();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1472,7 +1593,7 @@ function initChart() {
 }
 
 // ═══════════════════════════════════════════════════════
-//  MARKET LOOP + TIMER LOOP
+//  MARKET + TIMER LOOPS
 // ═══════════════════════════════════════════════════════
 function startMarketLoop() {
     setInterval(() => {
@@ -1491,7 +1612,6 @@ function startMarketLoop() {
             document.getElementById('tradePrice').innerText = fmtUSD(a.price);
             calcConv();
         }
-        buildTicker();
         updateCryptoPrices();
     }, 5000);
 }
@@ -1514,10 +1634,8 @@ function updateCryptoPrices() {
 function startTimerLoop() {
     setInterval(() => {
         if (!user?.membership || !user.membershipBuyTime) return;
-        const plan = memberships[user.membership];
         const remaining = cycleMs() - elapsed();
 
-        // Timer in home cycle card
         const timerEl = document.getElementById('cycleTimer');
         const wTimerEl = document.getElementById('withdrawTimer');
         if (remaining <= 0) {
@@ -1533,14 +1651,13 @@ function startTimerLoop() {
             if (wTimerEl) wTimerEl.innerText = str;
         }
 
-        // Progress bar
         const pct = Math.min(100, (elapsed()/cycleMs())*100);
         const bar = document.getElementById('cycleBar');
         const pctEl = document.getElementById('cyclePct');
         if (bar) bar.style.width = pct + '%';
         if (pctEl) pctEl.innerText = pct.toFixed(1) + '%';
 
-        // Earnings
+        const plan = memberships[user.membership];
         const days = Math.min(elapsed()/86400000, plan.days);
         const earnVal = document.getElementById('earningsValue');
         if (earnVal) earnVal.innerText = `+$${(days*plan.daily).toFixed(4)}`;
@@ -1570,39 +1687,43 @@ function logout() {
 }
 
 // ═══════════════════════════════════════════════════════
-//  ████  ADMIN PANEL  ████
+//  ADMIN PANEL — Firestore real-time
 // ═══════════════════════════════════════════════════════
 function showAdminPanel() {
     document.getElementById('authSection').style.display = 'none';
     document.getElementById('adminLoginSection').style.display = 'none';
     document.getElementById('dashboard').style.display = 'none';
     document.getElementById('adminDashboard').style.display = 'block';
-    renderAdminPanel();
+
+    // Real-time listener
+    if (adminUnsubscribe) adminUnsubscribe();
+    adminUnsubscribe = window._fs.listenAllUsers((users) => {
+        allUsersCache = users;
+        renderAdminStats(users);
+        filterAdminUsers();
+    });
 }
+
 function adminLogout() {
     localStorage.removeItem('fnl_active_user');
+    if (adminUnsubscribe) { adminUnsubscribe(); adminUnsubscribe = null; }
     document.getElementById('adminDashboard').style.display = 'none';
     showAuthSection();
     showToast('info', 'Sesión admin cerrada');
 }
 
-let allUsersCache = [];
-
-function renderAdminPanel() {
-    const db = getDB();
-    allUsersCache = Object.values(db);
-    const total = allUsersCache.reduce((a,u) => a+(u.balance||0), 0);
-    const withMem = allUsersCache.filter(u=>u.membership).length;
+function renderAdminStats(users) {
+    const total = users.reduce((a,u) => a+(u.balance||0), 0);
+    const withMem = users.filter(u=>u.membership).length;
     document.getElementById('adminStats').innerHTML = `
-        <div class="admin-stat-card"><div class="admin-stat-val">${allUsersCache.length}</div><div class="admin-stat-label">Usuarios Totales</div></div>
+        <div class="admin-stat-card"><div class="admin-stat-val">${users.length}</div><div class="admin-stat-label">Usuarios Totales</div></div>
         <div class="admin-stat-card"><div class="admin-stat-val">${withMem}</div><div class="admin-stat-label">Con Plan Activo</div></div>
         <div class="admin-stat-card"><div class="admin-stat-val">$${total.toFixed(2)}</div><div class="admin-stat-label">Saldo Total (USDT)</div></div>`;
-    renderUserCards(allUsersCache);
 }
 
 function filterAdminUsers() {
-    const q = document.getElementById('adminSearch').value.toLowerCase();
-    const filtered = allUsersCache.filter(u => u.username.toLowerCase().includes(q));
+    const q = (document.getElementById('adminSearch')?.value || '').toLowerCase();
+    const filtered = q ? allUsersCache.filter(u => u.username.toLowerCase().includes(q)) : allUsersCache;
     renderUserCards(filtered);
 }
 
@@ -1610,9 +1731,10 @@ function renderUserCards(users) {
     const listEl = document.getElementById('adminUserList');
     listEl.innerHTML = '';
     if (!users.length) {
-        listEl.innerHTML = '<div style="color:var(--text-muted);padding:20px;text-align:center;font-size:0.85rem;">No hay usuarios que coincidan.</div>';
+        listEl.innerHTML = '<div style="color:var(--text-muted);padding:20px;text-align:center;font-size:0.85rem;">No hay usuarios registrados aún.</div>';
         return;
     }
+    // Sort newest first based on joinDate or just show all
     users.forEach(u => {
         const refs = (u.referrals||[]).length;
         const card = document.createElement('div');
@@ -1652,7 +1774,7 @@ function openAdminModal(title, html) {
 function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
 
 function adminChangeMem(ukey) {
-    const db = getDB(); const u = db[ukey];
+    const u = allUsersCache.find(u => u.username.toLowerCase() === ukey);
     if (!u) return;
     openAdminModal(`Cambiar Plan: ${u.username}`, `
         <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px;">Plan actual: <strong style="color:#fff;">${u.membership?u.membership.toUpperCase():'NINGUNO'}</strong></div>
@@ -1667,18 +1789,19 @@ function adminChangeMem(ukey) {
         <button class="btn-admin-action" onclick="confirmChangeMem('${ukey}')">CONFIRMAR</button>`);
     document.getElementById('adminMemSelect').value = u.membership || '';
 }
-function confirmChangeMem(ukey) {
-    const db = getDB(); const u = db[ukey];
+
+async function confirmChangeMem(ukey) {
+    const u = allUsersCache.find(u => u.username.toLowerCase() === ukey);
     if (!u) return;
     u.membership = document.getElementById('adminMemSelect').value || null;
     if (u.membership) u.membershipBuyTime = Date.now();
-    db[ukey] = u; saveDB(db);
-    closeAdminModal(); renderAdminPanel();
+    await window._fs.saveUser(u);
+    closeAdminModal();
     showToast('success', `Plan de ${u.username} actualizado`);
 }
 
 function adminSendBalance(ukey) {
-    const db = getDB(); const u = db[ukey];
+    const u = allUsersCache.find(u => u.username.toLowerCase() === ukey);
     if (!u) return;
     openAdminModal(`Enviar Saldo a ${u.username}`, `
         <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px;">Saldo actual: <strong style="color:var(--accent);font-family:'DM Mono',monospace;">$${(u.balance||0).toFixed(2)} USDT</strong></div>
@@ -1686,8 +1809,9 @@ function adminSendBalance(ukey) {
         <input type="text"   class="admin-input" id="adminBalDesc"   placeholder="Descripción (ej: Bono especial)">
         <button class="btn-admin-action" onclick="confirmSendBalance('${ukey}')">ENVIAR SALDO</button>`);
 }
-function confirmSendBalance(ukey) {
-    const db = getDB(); const u = db[ukey];
+
+async function confirmSendBalance(ukey) {
+    const u = allUsersCache.find(u => u.username.toLowerCase() === ukey);
     if (!u) return;
     const amount = parseFloat(document.getElementById('adminBalAmount').value) || 0;
     const desc   = document.getElementById('adminBalDesc').value.trim() || 'Saldo por Admin';
@@ -1695,32 +1819,33 @@ function confirmSendBalance(ukey) {
     u.balance = (u.balance||0) + amount;
     u.tx = u.tx || [];
     u.tx.push({ desc:`💰 ${desc}`, amount, type:'bonus', date:new Date().toLocaleString() });
-    db[ukey] = u; saveDB(db);
-    closeAdminModal(); renderAdminPanel();
+    await window._fs.saveUser(u);
+    closeAdminModal();
     showToast('success', `$${amount.toFixed(2)} enviado a ${u.username}`);
 }
 
 function adminSendMessage(ukey) {
-    const db = getDB(); const u = db[ukey];
+    const u = allUsersCache.find(u => u.username.toLowerCase() === ukey);
     if (!u) return;
     openAdminModal(`Mensaje a ${u.username}`, `
         <textarea class="admin-input" id="adminMsgText" placeholder="Escribe el mensaje..." style="height:90px;resize:none;padding:12px;"></textarea>
         <button class="btn-admin-action" onclick="confirmSendMessage('${ukey}')">ENVIAR</button>`);
 }
-function confirmSendMessage(ukey) {
-    const db = getDB(); const u = db[ukey];
+
+async function confirmSendMessage(ukey) {
+    const u = allUsersCache.find(u => u.username.toLowerCase() === ukey);
     if (!u) return;
     const text = document.getElementById('adminMsgText').value.trim();
     if (!text) return showToast('error', 'Escribe un mensaje');
     u.adminMessages = u.adminMessages || [];
     u.adminMessages.push({ text, date:new Date().toLocaleString() });
-    db[ukey] = u; saveDB(db);
-    closeAdminModal(); renderAdminPanel();
+    await window._fs.saveUser(u);
+    closeAdminModal();
     showToast('success', `Mensaje enviado a ${u.username}`);
 }
 
 function adminViewReferrals(ukey) {
-    const db = getDB(); const u = db[ukey];
+    const u = allUsersCache.find(u => u.username.toLowerCase() === ukey);
     if (!u) return;
     const refs = u.referrals || [];
     let html = `<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px;">Total: <strong style="color:#fff;">${refs.length}</strong> · Ganado: <strong style="color:var(--accent);font-family:'DM Mono',monospace;">$${(u.referralEarned||0).toFixed(2)}</strong></div>`;
@@ -1728,67 +1853,12 @@ function adminViewReferrals(ukey) {
         html += `<div style="text-align:center;color:var(--text-muted);padding:20px;font-size:0.83rem;">Sin referidos aún.</div>`;
     } else {
         refs.forEach(rkey => {
-            const ref = db[rkey];
+            const ref = allUsersCache.find(u => u.username.toLowerCase() === rkey);
             if (ref) html += `<div style="background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;padding:11px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-weight:600;font-size:0.88rem;">${ref.username}</div><div style="font-size:0.68rem;color:var(--text-muted);">${ref.membership?ref.membership.toUpperCase():'SIN PLAN'}</div></div><div style="font-family:'DM Mono',monospace;color:var(--accent);font-size:0.88rem;">$${(ref.balance||0).toFixed(2)}</div></div>`;
         });
     }
     openAdminModal(`Referidos de ${u.username}`, html);
 }
-
-// ─── DB Export / Import ───
-function exportDB() {
-    const db = getDB();
-    const blob = new Blob([JSON.stringify(db, null, 2)], {type:'application/json'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `fnl_db_${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
-    showToast('success', 'Base de datos exportada');
-}
-function importDB() {
-    document.getElementById('dbFileInput').click();
-}
-function handleImportDB(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            const imported = JSON.parse(e.target.result);
-            const existing = getDB();
-            // Merge: imported wins on conflict
-            const merged = { ...existing, ...imported };
-            saveDB(merged);
-            showToast('success', `DB importada: ${Object.keys(imported).length} usuarios`);
-            renderAdminPanel();
-        } catch { showToast('error', 'Archivo inválido'); }
-    };
-    reader.readAsText(file);
-    event.target.value = '';
-}
 </script>
 </body>
-    <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyAoURhKrrv-H934vqLmyfRIjDMaYUnceLE",
-    authDomain: "latinfinancial-4766a.firebaseapp.com",
-    projectId: "latinfinancial-4766a",
-    storageBucket: "latinfinancial-4766a.firebasestorage.app",
-    messagingSenderId: "629202718534",
-    appId: "1:629202718534:web:535a3eca6b97c9562e1f47",
-    measurementId: "G-XH13MYBPV2"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
 </html>
